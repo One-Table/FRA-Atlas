@@ -1,8 +1,9 @@
-import Map from "@/components/frarecords/Map";
-import InfoG3 from "@/components/frarecords/InfoG3";
-import InfoG4 from "@/components/frarecords/InfoG4";
+"use client"; 
 import InfoG1 from "@/components/frarecords/InfoG1";
 import InfoG2 from "@/components/frarecords/InfoG2";
+import InfoG3 from "@/components/frarecords/InfoG3";
+import InfoG4 from "@/components/frarecords/InfoG4";
+import Map from "@/components/frarecords/Map";
 
 export default function Page() {
   return (
