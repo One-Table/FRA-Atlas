@@ -1,7 +1,7 @@
 const InfoG1 = () => {
   return <div className="flex w-full h-68 border-amber-300 border-4">
 
-    Infographic 1
+    Infographic 2
   </div>;
 }
 
