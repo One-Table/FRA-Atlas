@@ -1,6 +1,11 @@
-import Map from "@/components/fraatlas/Map";
+"use client";
 import Fact from "@/components/fraatlas/Fact";
 import SearchBox from "@/components/fraatlas/SearchBox";
+import dynamic from "next/dynamic";
+const EnhancedFRAMap = dynamic(
+  () => import("@/components/fraatlas/EnhancedFRAMap"),
+  { ssr: false }
+);
 
 
 export default function Home() {
@@ -8,7 +13,7 @@ export default function Home() {
     <div className="flex h-screen">
       {/* Left Section */}
       <div className="w-1/2 flex items-center justify-center bg-gray-200">
-        <Map />
+        <EnhancedFRAMap />
       </div>
 
       {/* Right Section */}

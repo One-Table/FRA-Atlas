@@ -83,7 +83,7 @@ const InfoG2: React.FC = () => (
         <YAxis
           dataKey="sector"
           type="category"
-          width={170}
+          width={10}
           tick={<CustomYAxisTick />}
           axisLine={false}
           tickLine={false}

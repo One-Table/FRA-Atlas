@@ -18,6 +18,18 @@
     --foreground: #ededed;
   }
 }
+/* Add to your global CSS */
+@import 'leaflet/dist/leaflet.css';
+
+.leaflet-popup-content-wrapper {
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.leaflet-popup-content {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  margin: 8px 12px;
+}
 
 body {
   background: var(--background);
