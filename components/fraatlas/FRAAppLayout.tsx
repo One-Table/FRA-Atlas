@@ -35,49 +35,6 @@ const fraData: Record<string, any> = {
   },
 };
 
-const indianStates = [
-  "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal", "Andaman and Nicobar", "Dadra and Nagar Haveli", "Delhi", "Jammu and Kashmir", "Ladakh", "Lakshadweep", "Puducherry",
-];
-
-const indianStatesBounds: Record<string, [[number, number], [number, number]]> = {
-  "Andhra Pradesh": [[12.41, 77.0], [19.07, 84.93]],
-  "Arunachal Pradesh": [[26.91, 91.35], [29.39, 97.15]],
-  "Assam": [[24.0, 89.5], [28.27, 96.05]],
-  "Bihar": [[24.5, 83.0], [27.7, 88.2]],
-  "Chhattisgarh": [[17.2, 80.9], [24.1, 84.7]],
-  "Goa": [[14.8, 73.7], [15.7, 74.3]],
-  "Gujarat": [[20.1, 68.1], [24.75, 74.4]],
-  "Haryana": [[27.6, 74.5], [30.9, 77.1]],
-  "Himachal Pradesh": [[30.4, 75.3], [33.2, 79.1]],
-  "Jharkhand": [[22.0, 83.3], [24.3, 86.6]],
-  "Karnataka": [[11.6, 74.0], [18.5, 78.5]],
-  "Kerala": [[8.1, 74.0], [12.6, 77.4]],
-  "Madhya Pradesh": [[21.2, 74.0], [26.5, 82.8]],
-  "Maharashtra": [[15.6, 72.6], [22.0, 80.9]],
-  "Manipur": [[23.8, 93.0], [25.9, 94.9]],
-  "Meghalaya": [[25.0, 89.5], [26.5, 92.2]],
-  "Mizoram": [[21.5, 92.3], [23.3, 93.3]],
-  "Nagaland": [[25.0, 93.3], [27.3, 95.3]],
-  "Odisha": [[17.5, 81.3], [22.5, 87.5]],
-  "Punjab": [[29.4, 73.8], [32.3, 76.9]],
-  "Rajasthan": [[23.3, 69.5], [30.1, 78.2]],
-  "Sikkim": [[27.0, 88.0], [28.0, 88.9]],
-  "Tamil Nadu": [[8.0, 76.1], [13.5, 80.3]],
-  "Telangana": [[15.9, 77.95], [19.42, 80.46]],
-  "Tripura": [[22.5, 91.2], [24.0, 92.0]],
-  "Uttar Pradesh": [[24.4, 77.0], [31.0, 84.0]],
-  "Uttarakhand": [[28.6, 77.5], [31.3, 81.0]],
-  "West Bengal": [[21.45, 85.3], [27.1, 89.9]],
-  "Andaman and Nicobar Islands": [[6.5, 92.0], [13.0, 94.0]],
-  "Chandigarh": [[30.7, 76.7], [30.8, 76.8]],
-  "Dadra and Nagar Haveli": [[20.0, 72.8], [20.3, 73.2]],
-  "Delhi": [[28.4, 76.84], [28.88, 77.34]],
-  "Jammu and Kashmir": [[32.17, 73.75], [37.09, 80.3]],
-  "Ladakh": [[32.67, 76.12], [34.54, 79.3]],
-  "Lakshadweep": [[10.5, 71.0], [12.0, 73.5]],
-  "Puducherry": [[11.9, 79.7], [12.0, 79.9]],
-};
-
 const odishaDistrictCenters = [
   // Very High Potential
   {
@@ -266,19 +223,10 @@ const getFactSheetHTML = (factSheet: any, districtName: string) => `
 const FRAAppLayout: React.FC = () => {
   const mapRef = useRef<LeafletMap | null>(null);
   const odishaLayerRef = useRef<FeatureGroup | null>(null);
-  const currentHighlightRef = useRef<Layer | null>(null);
 
-  const [selectedState, setSelectedState] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [modalDistrict, setModalDistrict] = useState("");
   const [modalCategory, setModalCategory] = useState("");
-
-  const getDistrictCategory = (districtName: string) => {
-    for (const [category, data] of Object.entries(fraData) as [string, any][]) {
-      if (data.districts.includes(districtName)) return category;
-    }
-    return "Unknown";
-  };
 
   useEffect(() => {
     if (!mapRef.current) {
@@ -314,157 +262,33 @@ const FRAAppLayout: React.FC = () => {
 
     markers.addTo(map);
     odishaLayerRef.current = markers;
+
+    // Fit map to show all districts
+    const odishaBounds = markers.getBounds();
+    if (odishaBounds.isValid()) {
+      map.fitBounds(odishaBounds);
+    }
   }, []);
-
-  useEffect(() => {
-    if (!selectedState || !mapRef.current) return;
-    const map = mapRef.current;
-
-    if (currentHighlightRef.current) {
-      map.removeLayer(currentHighlightRef.current);
-      currentHighlightRef.current = null;
-    }
-
-    const bounds = indianStatesBounds[selectedState];
-    if (bounds && bounds.length === 2 && bounds[0].length === 2 && bounds[1].length === 2) {
-      const highlight = L.rectangle(bounds, {
-        color: "#e74c3c",
-        weight: 3,
-        fillOpacity: 0.1,
-        dashArray: "10,5",
-      }).addTo(map);
-      currentHighlightRef.current = highlight;
-      map.fitBounds(bounds);
-
-      if (selectedState === "Odisha" && odishaLayerRef.current) {
-        const odishaBounds = odishaLayerRef.current.getBounds();
-        if (odishaBounds.isValid()) {
-          map.fitBounds(odishaBounds);
-        }
-      }
-    } else {
-      console.error("Invalid or missing bounds for selected state:", selectedState);
-    }
-  }, [selectedState]);
 
   return (
     <div style={{ 
       padding: '20px', 
       fontFamily: 'Arial, sans-serif',
-      maxWidth: '1400px',
+      maxWidth: '1800px',
       margin: '0 auto',
-      background: '#1a1a1a',
-      minHeight: '100vh',
+      background: 'white',
+      minHeight: '50vh',
+      minWidth:'56vw',
       color: '#ffffff'
     }}>
-      <header style={{ 
-        textAlign: 'center', 
-        marginBottom: '30px',
-        padding: '20px',
-        background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.1) 100%)',
-        borderRadius: '10px',
-        boxShadow: '0 4px 15px rgba(0,0,0,0.3)',
-        border: '1px solid #444'
-      }}>
-        <h1 style={{ 
-          margin: '0 0 10px 0', 
-          color: '#ffffff',
-          fontSize: '2.5rem',
-          textShadow: '2px 2px 4px rgba(0,0,0,0.5)'
-        }}>FRA Atlas of Odisha</h1>
-        <p style={{ 
-          margin: 0, 
-          color: '#bdc3c7',
-          fontSize: '1.1rem'
-        }}>Interactive Map - Forest Rights Act Implementation Potential</p>
-      </header>
-
       <div style={{
         display: 'grid',
-        gridTemplateColumns: '1fr 2fr 1fr',
+        gridTemplateColumns: '2fr 1fr',
         gap: '20px',
         alignItems: 'start'
       }}>
-        <div style={{
-          background: 'linear-gradient(135deg, #34495e 0%, rgba(0,0,0,0.2) 100%)',
-          padding: '20px',
-          borderRadius: '10px',
-          boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
-          height: 'fit-content',
-          border: '1px solid #444'
-        }}>
-          <div style={{ marginBottom: '20px' }}>
-            <label htmlFor="stateSelect" style={{ 
-              display: 'block', 
-              marginBottom: '8px',
-              fontWeight: 'bold',
-              color: '#ffffff'
-            }}>Select State</label>
-            <select
-              id="stateSelect"
-              value={selectedState}
-              onChange={(e) => setSelectedState(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '12px',
-                border: '2px solid #555',
-                borderRadius: '8px',
-                fontSize: '14px',
-                background: 'rgba(0,0,0,0.2)',
-                color: '#ffffff',
-                outline: 'none'
-              }}
-            >
-              <option value="">-- Select --</option>
-              {indianStates.map((state) => (
-                <option key={state} value={state} style={{ background: 'black', color: '#ffffff' }}>
-                  {state}
-                </option>
-              ))}
-            </select>
-            <button 
-              onClick={() => setSelectedState("")}
-              style={{
-                width: '100%',
-                marginTop: '12px',
-                padding: '12px',
-                background: 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)',
-                color: 'white',
-                border: 'none',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: 'bold',
-                transition: 'all 0.3s ease',
-                boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 4px 10px rgba(0,0,0,0.3)';
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
-              }}
-            >Reset View</button>
-          </div>
-
-          <div>
-            <h3 style={{ marginBottom: '15px', color: '#ffffff', borderBottom: '2px solid #3498db', paddingBottom: '8px' }}>About Forest Rights Act (FRA) 2006</h3>
-            <p style={{ 
-              fontSize: '14px', 
-              lineHeight: '1.6',
-              color: '#bdc3c7',
-              margin: 0
-            }}>
-              The Forest Rights Act recognizes forest-dwelling Scheduled Tribes and
-              traditional forest dwellers' rights over forests and land.
-            </p>
-          </div>
-        </div>
-
         <div id="map" style={{ 
-          height: '500px', 
+          height: '600px', 
           borderRadius: '10px',
           boxShadow: '0 6px 20px rgba(0,0,0,0.4)',
           border: '2px solid #555',
