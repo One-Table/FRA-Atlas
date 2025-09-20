@@ -173,8 +173,195 @@ const fraColorFor = (category: string) =>
     "Very Low Potential": "#95a6a6",
   }[category] || "#ccc");
 
+// District Search Component
+const DistrictSearchBar: React.FC<{ onDistrictSelect: (district: any) => void }> = ({ onDistrictSelect }) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filteredDistricts, setFilteredDistricts] = useState<any[]>([]);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
+
+  // Filter districts based on search term
+  useEffect(() => {
+    if (searchTerm.trim() === '') {
+      setFilteredDistricts([]);
+      setIsDropdownOpen(false);
+    } else {
+      const filtered = odishaDistrictCenters.filter(district =>
+        district.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        district.category.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredDistricts(filtered);
+      setIsDropdownOpen(true);
+    }
+  }, [searchTerm]);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleDistrictSelect = (district: any) => {
+    setSearchTerm(district.name);
+    setIsDropdownOpen(false);
+    onDistrictSelect(district);
+  };
+
+  const clearSearch = () => {
+    setSearchTerm('');
+    setFilteredDistricts([]);
+    setIsDropdownOpen(false);
+  };
+
+  return (
+    <div ref={searchRef} style={{ position: 'relative', marginBottom: '15px' }}>
+      {/* Search Input */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        border: '2px solid #3498db',
+        borderRadius: '8px',
+        backgroundColor: 'white',
+        padding: '8px 12px',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+      }}>
+        {/* Search Icon */}
+        <svg 
+          width="16" 
+          height="16" 
+          viewBox="0 0 24 24" 
+          fill="none" 
+          stroke="#3498db" 
+          strokeWidth="2" 
+          style={{ marginRight: '8px', flexShrink: 0 }}
+        >
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="21 21l-4.35-4.35"></path>
+        </svg>
+
+        {/* Input Field */}
+        <input
+          type="text"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Search districts..."
+          style={{
+            flex: 1,
+            border: 'none',
+            outline: 'none',
+            fontSize: '12px',
+            color: '#333',
+            fontWeight: '500'
+          }}
+        />
+
+        {/* Clear Button */}
+        {searchTerm && (
+          <button
+            onClick={clearSearch}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              padding: '4px',
+              borderRadius: '4px',
+              marginLeft: '4px',
+              color: '#666'
+            }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        )}
+      </div>
+
+      {/* Dropdown Results */}
+      {isDropdownOpen && filteredDistricts.length > 0 && (
+        <div style={{
+          position: 'absolute',
+          top: '100%',
+          left: 0,
+          right: 0,
+          backgroundColor: 'white',
+          border: '1px solid #ddd',
+          borderRadius: '8px',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+          zIndex: 1000,
+          maxHeight: '200px',
+          overflowY: 'auto'
+        }}>
+          {filteredDistricts.map((district, index) => (
+            <div
+              key={district.name}
+              onClick={() => handleDistrictSelect(district)}
+              style={{
+                padding: '10px 12px',
+                cursor: 'pointer',
+                borderBottom: index < filteredDistricts.length - 1 ? '1px solid #f0f0f0' : 'none',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f5f5f5'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'white'}
+            >
+              <div>
+                <div style={{ fontWeight: '600', color: '#333', fontSize: '12px' }}>
+                  {district.name}
+                </div>
+                <div style={{ fontSize: '10px', color: '#666', marginTop: '2px' }}>
+                  {district.category}
+                </div>
+              </div>
+              <div
+                style={{
+                  width: '10px',
+                  height: '10px',
+                  borderRadius: '50%',
+                  backgroundColor: fraColorFor(district.category),
+                  border: '1px solid white',
+                  boxShadow: '0 1px 2px rgba(0,0,0,0.2)'
+                }}
+              />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* No Results Message */}
+      {isDropdownOpen && searchTerm && filteredDistricts.length === 0 && (
+        <div style={{
+          position: 'absolute',
+          top: '100%',
+          left: 0,
+          right: 0,
+          backgroundColor: 'white',
+          border: '1px solid #ddd',
+          borderRadius: '8px',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+          zIndex: 1000,
+          padding: '15px',
+          textAlign: 'center',
+          color: '#666',
+          fontSize: '12px'
+        }}>
+          No districts found for "{searchTerm}"
+        </div>
+      )}
+    </div>
+  );
+};
+
 // Legends Panel Component (20% width)
-const LegendsPanel: React.FC = () => {
+const LegendsPanel: React.FC<{ onDistrictSelect: (district: any) => void }> = ({ onDistrictSelect }) => {
   return (
     <div style={{
       background: 'white',
@@ -184,6 +371,9 @@ const LegendsPanel: React.FC = () => {
       height: '580px',
       overflow: 'auto'
     }}>
+      {/* Search Bar at the top */}
+      <DistrictSearchBar onDistrictSelect={onDistrictSelect} />
+
       <h3 style={{ 
         margin: '0 0 20px 0', 
         color: '#333', 
@@ -285,19 +475,7 @@ const DistrictStatistics: React.FC<{ district: any; onClose: () => void }> = ({ 
           District Statistics
         </h3>
         <div style={{ textAlign: 'center', color: '#999' }}>
-          {/* <div style={{
-            width: '80px',
-            height: '80px',
-            margin: '40px auto',
-            background: '#f0f0f0',
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}>
-            <span style={{ fontSize: '30px' }}></span>
-          </div> */}
-          <p style={{ fontSize: '14px' }}>Click on a district marker to view detailed statistics</p>
+          <p style={{ fontSize: '14px' }}>Click on a district marker or search for a district to view detailed statistics</p>
         </div>
       </div>
     );
@@ -589,6 +767,16 @@ const FRAAppLayout: React.FC = () => {
     }
   }, []);
 
+  // Handle district selection from search
+  const handleDistrictSelect = (district: any) => {
+    setSelectedDistrict(district);
+    
+    // Zoom to the selected district on the map
+    if (mapRef.current) {
+      mapRef.current.setView([district.lat, district.lng], 8);
+    }
+  };
+
   return (
     <div style={{ 
       padding: '20px', 
@@ -604,7 +792,7 @@ const FRAAppLayout: React.FC = () => {
         margin: '0 auto'
       }}>
         {/* Left Panel - Legends (20%) */}
-        <LegendsPanel />
+        <LegendsPanel onDistrictSelect={handleDistrictSelect} />
         
         {/* Center Panel - Map (60%) */}
         <div style={{

@@ -6,12 +6,12 @@ import { useEffect, useMemo, useState } from 'react';
 
 // Import data and utilities from external mock-data
 import {
-    districtBoundaries,
-    handleEnhancedClaimSelect,
-    mockFRACommunityResourceClaims,
-    mockFRAIndividualClaims,
-    type FRACommunityResourceClaim,
-    type FRAIndividualClaim
+  districtBoundaries,
+  handleEnhancedClaimSelect,
+  mockFRACommunityResourceClaims,
+  mockFRAIndividualClaims,
+  type FRACommunityResourceClaim,
+  type FRAIndividualClaim
 } from './data/mock-data';
 
 // Dynamic import for map components to avoid SSR issues
@@ -154,8 +154,8 @@ const FRAClaimsPage = () => {
     if (!Icon) return null;
     return (
       <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium border ${config.color}`}>
-        <Icon size={12}/>
-        {status.charAt(0).toUpperCase()+status.slice(1)}
+        <Icon size={12} />
+        {status.charAt(0).toUpperCase() + status.slice(1)}
       </span>
     );
   };
@@ -178,30 +178,47 @@ const FRAClaimsPage = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="bg-gradient-to-r from-green-600 to-green-700 shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold text-white">FRA Claims Registry</h1>
-            <p className="text-green-100 mt-1">Forest Rights Act - Claims Verification & Lookup System</p>
+      <header className="bg-white shadow-sm border-b-4 border-yellow-400">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+
+          {/* Left Logo + Title */}
+          <div className="flex items-center gap-4">
+            {/* Ministry Logo (replace src with correct logo path) */}
+            <img
+              src="/logo-emblem.png"
+              alt="Emblem of India"
+              className="h-12 w-auto"
+            />
+            <div>
+              <h1 className="text-xl font-bold text-gray-900">
+                जनजातीय कार्य मंत्रालय
+              </h1>
+              <h2 className="text-xl font-bold text-gray-900">
+                MINISTRY OF TRIBAL AFFAIRS
+              </h2>
+            </div>
           </div>
-          <div className="flex items-center gap-6 text-white">
+
+          {/* Right Stats */}
+          <div className="flex items-center gap-8 text-gray-800">
             <div className="text-center">
               <div className="text-2xl font-bold">{allClaims.length}</div>
-              <div className="text-sm text-green-100">Total Claims</div>
+              <div className="text-sm text-gray-600">Total Claims</div>
             </div>
-            <div className="w-px h-12 bg-green-400"></div>
+            <div className="w-px h-10 bg-gray-300"></div>
             <div className="text-center">
-              <div className="text-2xl font-bold">{allClaims.filter(c => c.status=== 'approved').length}</div>
-              <div className="text-sm text-green-100">Approved</div>
+              <div className="text-2xl font-bold text-green-700">{allClaims.filter(c => c.status === 'approved').length}</div>
+              <div className="text-sm text-gray-600">Approved</div>
             </div>
-            <div className="w-px h-12 bg-green-400"></div>
+            <div className="w-px h-10 bg-gray-300"></div>
             <div className="text-center">
-              <div className="text-2xl font-bold">{allClaims.filter(c => c.status=== 'pending').length}</div>
-              <div className="text-sm text-green-100">Pending</div>
+              <div className="text-2xl font-bold text-yellow-600">{allClaims.filter(c => c.status === 'pending').length}</div>
+              <div className="text-sm text-gray-600">Pending</div>
             </div>
           </div>
         </div>
       </header>
+
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Search and Filters Panel */}
@@ -217,7 +234,7 @@ const FRAClaimsPage = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">Search By</label>
                 <select
                   value={searchType}
-                  onChange={e => setSearchType(e.target.value as 'name'|'location'|'title')}
+                  onChange={e => setSearchType(e.target.value as 'name' | 'location' | 'title')}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all text-black bg-white"
                 >
                   <option value="name">Claimant Name</option>
@@ -230,16 +247,16 @@ const FRAClaimsPage = () => {
                 <input
                   type="text"
                   placeholder={
-                    searchType=== 'name'
+                    searchType === 'name'
                       ? 'Enter claimant name...'
-                      : searchType=== 'location'
-                      ? 'Enter village, district, or tehsil...'
-                      : 'Enter title number...'
+                      : searchType === 'location'
+                        ? 'Enter village, district, or tehsil...'
+                        : 'Enter title number...'
                   }
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all text-black bg-white placeholder-gray-500"
-                  style={{color:'#000', backgroundColor:'#fff'}}
+                  style={{ color: '#000', backgroundColor: '#fff' }}
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -294,11 +311,10 @@ const FRAClaimsPage = () => {
                     <div
                       key={claim.id}
                       onClick={() => handleClaimSelect(claim)}
-                      className={`p-4 hover:bg-green-50 cursor-pointer transition-all duration-200 border-l-4 ${
-                        selectedClaim?.id === claim.id
+                      className={`p-4 hover:bg-green-50 cursor-pointer transition-all duration-200 border-l-4 ${selectedClaim?.id === claim.id
                           ? 'border-green-500 bg-green-50'
                           : 'border-transparent hover:border-green-300'
-                      }`}
+                        }`}
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
@@ -525,9 +541,8 @@ const FRAClaimsPage = () => {
                           <div className="grid grid-cols-3 gap-2">
                             <span className="font-medium text-gray-700">Category:</span>
                             <span className="col-span-2">
-                              <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                                selectedClaim.scheduledTribe ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'
-                              }`}>
+                              <span className={`px-3 py-1 rounded-full text-xs font-medium ${selectedClaim.scheduledTribe ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'
+                                }`}>
                                 {selectedClaim.scheduledTribe ? 'Scheduled Tribe' : 'Other Traditional Forest Dweller'}
                               </span>
                             </span>
@@ -685,9 +700,8 @@ const FRAClaimsPage = () => {
                         {selectedClaim.claimants.map((claimant, idx) => (
                           <div key={idx} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border">
                             <span className="text-sm font-medium text-gray-900">{claimant.name}</span>
-                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                              claimant.status === 'ST' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'
-                            }`}>
+                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${claimant.status === 'ST' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'
+                              }`}>
                               {claimant.status === 'ST' ? 'Scheduled Tribe' : 'Other Traditional Forest Dweller'}
                             </span>
                           </div>
