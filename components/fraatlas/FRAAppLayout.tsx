@@ -1,5 +1,6 @@
+'use client'
 import React, { useEffect, useRef, useState } from "react";
-import L, { Map as LeafletMap, Layer, FeatureGroup } from "leaflet";
+import L, { Map as LeafletMap, FeatureGroup } from "leaflet";
 import "leaflet/dist/leaflet.css";
 
 const fraData: Record<string, any> = {
@@ -69,7 +70,6 @@ const odishaDistrictCenters = [
     name: "Sundargarh", lat: 22.1179, lng: 84.0171, category: "Very High Potential",
     factSheet: { blocks: 17, gPs: 262, totalVillages: 1764, inhabitedVillages: 1723, uninhabitedVillages: 41, fraPotentialVillages: 1632, fraNonPotentialVillages: 91, unsurveyed: 46, forestFringeVillages: 1023, villagesWithForestLand: 1530, totalForestArea: 5551.52, potentialForestAreaUnderFRA: 2701.97, potentialIFRArea: 318.36, potentialCFRArea: 2383.61 }
   },
-
   // High Potential
   {
     name: "Kalahandi", lat: 19.9139, lng: 83.1656, category: "High Potential",
@@ -99,7 +99,6 @@ const odishaDistrictCenters = [
     name: "Gajapati", lat: 18.8500, lng: 84.1333, category: "High Potential",
     factSheet: { blocks: 7, gPs: 129, totalVillages: 1619, inhabitedVillages: 1512, uninhabitedVillages: 107, fraPotentialVillages: 1371, fraNonPotentialVillages: 141, unsurveyed: 54, forestFringeVillages: 484, villagesWithForestLand: 1261, totalForestArea: 2483.80, potentialForestAreaUnderFRA: 2114.51, potentialIFRArea: 539.33, potentialCFRArea: 1575.18 }
   },
-
   // Moderate Potential
   {
     name: "Nayagarh", lat: 20.1276, lng: 85.0977, category: "Moderate Potential",
@@ -121,7 +120,6 @@ const odishaDistrictCenters = [
     name: "Deogarh", lat: 21.5363, lng: 84.7325, category: "Moderate Potential",
     factSheet: { blocks: 3, gPs: 60, totalVillages: 875, inhabitedVillages: 711, uninhabitedVillages: 164, fraPotentialVillages: 687, fraNonPotentialVillages: 24, unsurveyed: 12, forestFringeVillages: 515, villagesWithForestLand: 661, totalForestArea: 1560.30, potentialForestAreaUnderFRA: 1068.55, potentialIFRArea: 169.62, potentialCFRArea: 898.93 }
   },
-
   // Low Potential
   {
     name: "Jharsuguda", lat: 21.8579, lng: 84.0081, category: "Low Potential",
@@ -139,7 +137,6 @@ const odishaDistrictCenters = [
     name: "Khordha", lat: 20.1826, lng: 85.6187, category: "Low Potential",
     factSheet: { blocks: 10, gPs: 168, totalVillages: 1551, inhabitedVillages: 1358, uninhabitedVillages: 193, fraPotentialVillages: 340, fraNonPotentialVillages: 1018, unsurveyed: 4, forestFringeVillages: 48, villagesWithForestLand: 318, totalForestArea: 684.37, potentialForestAreaUnderFRA: 364.10, potentialIFRArea: 146.98, potentialCFRArea: 217.12 }
   },
-
   // Very Low Potential
   {
     name: "Puri", lat: 19.8135, lng: 85.8312, category: "Very Low Potential",
@@ -176,57 +173,375 @@ const fraColorFor = (category: string) =>
     "Very Low Potential": "#95a6a6",
   }[category] || "#ccc");
 
-const getFactSheetHTML = (factSheet: any, districtName: string) => `
-  <div style="
-    background: black; 
-    color: white; 
-    padding: 15px; 
-    border-radius: 8px; 
-    font-family: Arial, sans-serif;
-    min-width: 280px;
-    max-width: 350px;
-  ">
-    <div style="
-      text-align: center; 
-      font-size: 16px; 
-      font-weight: bold; 
-      margin-bottom: 15px;
-      border-bottom: 1px solid #444;
-      padding-bottom: 8px;
-    ">
-      ${districtName.toUpperCase()} FACT SHEET
+// Legends Panel Component (20% width)
+const LegendsPanel: React.FC = () => {
+  return (
+    <div style={{
+      background: 'white',
+      borderRadius: '10px',
+      boxShadow: '0 6px 20px rgba(0,0,0,0.15)',
+      padding: '20px',
+      height: '580px',
+      overflow: 'auto'
+    }}>
+      <h3 style={{ 
+        margin: '0 0 20px 0', 
+        color: '#333', 
+        fontSize: '18px',
+        fontWeight: '600',
+        borderBottom: '2px solid #3498db',
+        paddingBottom: '10px'
+      }}>
+        FRA Potential Categories
+      </h3>
+      
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+        {Object.entries(fraData).map(([category, data]) => (
+          <div key={category} style={{
+            padding: '15px',
+            borderRadius: '8px',
+            border: '2px solid ' + data.color,
+            background: data.color + '10'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '6px' }}>
+              <span
+                style={{ 
+                  width: '20px',
+                  height: '20px',
+                  backgroundColor: data.color,
+                  display: 'inline-block',
+                  marginRight: '10px',
+                  borderRadius: '50%',
+                  border: '2px solid white',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                }}
+              ></span>
+              <h4 style={{ 
+                margin: '0', 
+                color: '#333', 
+                fontSize: '14px',
+                fontWeight: '600'
+              }}>
+                {category}
+              </h4>
+            </div>
+            
+            <div style={{ fontSize: '12px', color: '#666', marginBottom: '6px' }}>
+              <strong>CFR Potential:</strong> {data.cfrPotential}
+            </div>
+            
+            <div style={{ fontSize: '11px', color: '#666', marginBottom: '8px' }}>
+              {data.description}
+            </div>
+            
+            <div style={{ fontSize: '10px', color: '#888' }}>
+              <strong>Districts ({data.districts.length}):</strong><br/>
+              {data.districts.slice(0, 3).join(', ')}
+              {data.districts.length > 3 && ` +${data.districts.length - 3} more`}
+            </div>
+          </div>
+        ))}
+      </div>
+      
+      <div style={{
+        marginTop: '20px',
+        padding: '15px',
+        background: '#f8f9fa',
+        borderRadius: '8px',
+        border: '1px solid #e9ecef'
+      }}>
+        <h4 style={{ margin: '0 0 8px 0', fontSize: '12px', color: '#333' }}>
+          Total Overview
+        </h4>
+        <div style={{ fontSize: '11px', color: '#666' }}>
+          <div>• {odishaDistrictCenters.length} Districts</div>
+          <div>• {Object.keys(fraData).length} Categories</div>
+          <div>• Interactive Map Visualization</div>
+        </div>
+      </div>
     </div>
-    
-    <table style="
-      width: 100%; 
-      font-size: 12px; 
-      border-collapse: collapse;
-    ">
-      <tr style="background: #333;"><td style="padding: 5px; border-bottom: 1px solid #555;"><strong>No. of Blocks</strong></td><td style="padding: 5px; border-bottom: 1px solid #555; text-align: right;"><strong>${factSheet.blocks}</strong></td></tr>
-      <tr><td style="padding: 5px; border-bottom: 1px solid #555;">No. of GPs</td><td style="padding: 5px; border-bottom: 1px solid #555; text-align: right;">${factSheet.gPs}</td></tr>
-      <tr style="background: #333;"><td style="padding: 5px; border-bottom: 1px solid #555;"><strong>Total No. of Villages</strong></td><td style="padding: 5px; border-bottom: 1px solid #555; text-align: right;"><strong>${factSheet.totalVillages}</strong></td></tr>
-      <tr><td style="padding: 5px; border-bottom: 1px solid #555;">No. of Inhabited Villages</td><td style="padding: 5px; border-bottom: 1px solid #555; text-align: right;">${factSheet.inhabitedVillages}</td></tr>
-      <tr style="background: #333;"><td style="padding: 5px; border-bottom: 1px solid #555;">No. of Uninhabited Villages</td><td style="padding: 5px; border-bottom: 1px solid #555; text-align: right;">${factSheet.uninhabitedVillages}</td></tr>
-      <tr><td style="padding: 5px; border-bottom: 1px solid #555;">No. of FRA Potential Villages</td><td style="padding: 5px; border-bottom: 1px solid #555; text-align: right;">${factSheet.fraPotentialVillages}</td></tr>
-      <tr style="background: #333;"><td style="padding: 5px; border-bottom: 1px solid #555;">No. of FRA Non-Potential Villages</td><td style="padding: 5px; border-bottom: 1px solid #555; text-align: right;">${factSheet.fraNonPotentialVillages}</td></tr>
-      <tr><td style="padding: 5px; border-bottom: 1px solid #555;">No. of Unsurveyed villages</td><td style="padding: 5px; border-bottom: 1px solid #555; text-align: right;">${factSheet.unsurveyed}</td></tr>
-      <tr style="background: #333;"><td style="padding: 5px; border-bottom: 1px solid #555;"><strong>No. of Forest fringe villages</strong></td><td style="padding: 5px; border-bottom: 1px solid #555; text-align: right;"><strong>${factSheet.forestFringeVillages}</strong></td></tr>
-      <tr><td style="padding: 5px; border-bottom: 1px solid #555;">No. of Villages with forest land within village boundary</td><td style="padding: 5px; border-bottom: 1px solid #555; text-align: right;">${factSheet.villagesWithForestLand}</td></tr>
-      <tr style="background: #333;"><td style="padding: 5px; border-bottom: 1px solid #555;"><strong>Total Forest area (sq kms)</strong></td><td style="padding: 5px; border-bottom: 1px solid #555; text-align: right;"><strong>${factSheet.totalForestArea}</strong></td></tr>
-      <tr><td style="padding: 5px; border-bottom: 1px solid #555;">Potential Forest area under FRA (sq kms)</td><td style="padding: 5px; border-bottom: 1px solid #555; text-align: right;">${factSheet.potentialForestAreaUnderFRA}</td></tr>
-      <tr style="background: #333;"><td style="padding: 5px;">Potential IFR area (sq kms)</td><td style="padding: 5px; text-align: right;">${factSheet.potentialIFRArea}</td></tr>
-      <tr><td style="padding: 5px;">Potential CFR area (sq kms)</td><td style="padding: 5px; text-align: right;">${factSheet.potentialCFRArea}</td></tr>
-    </table>
-  </div>
-`;
+  );
+};
 
+// District Statistics Component (20% width)
+const DistrictStatistics: React.FC<{ district: any; onClose: () => void }> = ({ district, onClose }) => {
+  if (!district) {
+    return (
+      <div style={{
+        background: 'white',
+        borderRadius: '10px',
+        boxShadow: '0 6px 20px rgba(0,0,0,0.15)',
+        padding: '20px',
+        height: '580px',
+        overflow: 'auto'
+      }}>
+        <h3 style={{ 
+          color: '#666', 
+          textAlign: 'center', 
+          marginBottom: '20px',
+          fontSize: '18px',
+          fontWeight: '600'
+        }}>
+          District Statistics
+        </h3>
+        <div style={{ textAlign: 'center', color: '#999' }}>
+          {/* <div style={{
+            width: '80px',
+            height: '80px',
+            margin: '40px auto',
+            background: '#f0f0f0',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <span style={{ fontSize: '30px' }}></span>
+          </div> */}
+          <p style={{ fontSize: '14px' }}>Click on a district marker to view detailed statistics</p>
+        </div>
+      </div>
+    );
+  }
+
+  const getCategoryColor = (category: string) => {
+    const colors = {
+      "Very High Potential": "#27ae60",
+      "High Potential": "#2ecc71",
+      "Moderate Potential": "#f39c12",
+      "Low Potential": "#e74c3c",
+      "Very Low Potential": "#95a6a6"
+    };
+    return colors[category as keyof typeof colors] || "#ccc";
+  };
+
+  const fraEfficiency = Math.round(
+    (district.factSheet.fraPotentialVillages / district.factSheet.totalVillages) * 100
+  );
+
+  return (
+    <div style={{
+      background: 'white',
+      borderRadius: '10px',
+      boxShadow: '0 6px 20px rgba(0,0,0,0.15)',
+      overflow: 'hidden',
+      height: '580px',
+      display: 'flex',
+      flexDirection: 'column'
+    }}>
+      {/* Header */}
+      <div style={{
+        background: getCategoryColor(district.category),
+        padding: '15px',
+        color: 'white'
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <h2 style={{ margin: '0 0 3px 0', fontSize: '18px', fontWeight: 'bold' }}>
+              {district.name}
+            </h2>
+            <p style={{ margin: '0', fontSize: '12px', opacity: '0.9' }}>
+              {district.category}
+            </p>
+          </div>
+          <button 
+            onClick={onClose}
+            style={{
+              background: 'rgba(255,255,255,0.2)',
+              border: 'none',
+              borderRadius: '50%',
+              width: '28px',
+              height: '28px',
+              cursor: 'pointer',
+              color: 'white',
+              fontSize: '16px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            ×
+          </button>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div style={{ padding: '15px', flex: 1, overflow: 'auto' }}>
+        {/* Quick Stats */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '15px' }}>
+          <div style={{
+            textAlign: 'center',
+            padding: '10px',
+            background: '#f8f9fa',
+            borderRadius: '6px',
+            border: '1px solid #e9ecef'
+          }}>
+            <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#333', marginBottom: '2px' }}>
+              {district.factSheet.totalVillages.toLocaleString()}
+            </div>
+            <div style={{ fontSize: '10px', color: '#666' }}>Total Villages</div>
+          </div>
+          
+          <div style={{
+            textAlign: 'center',
+            padding: '10px',
+            background: '#f8f9fa',
+            borderRadius: '6px',
+            border: '1px solid #e9ecef'
+          }}>
+            <div style={{
+              fontSize: '16px',
+              fontWeight: 'bold',
+              color: getCategoryColor(district.category),
+              marginBottom: '2px'
+            }}>
+              {fraEfficiency}%
+            </div>
+            <div style={{ fontSize: '10px', color: '#666' }}>FRA Potential</div>
+          </div>
+        </div>
+
+        {/* Detailed Information Sections */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          {/* Administrative Division */}
+          <div>
+            <h4 style={{ 
+              margin: '0 0 6px 0', 
+              color: '#333', 
+              fontSize: '12px',
+              borderLeft: '3px solid #3498db',
+              paddingLeft: '6px'
+            }}>
+              Administrative
+            </h4>
+            <div style={{ fontSize: '11px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: '#666' }}>Blocks:</span>
+                <span style={{ fontWeight: '600' }}>{district.factSheet.blocks}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: '#666' }}>GPs:</span>
+                <span style={{ fontWeight: '600' }}>{district.factSheet.gPs}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Village Statistics */}
+          <div>
+            <h4 style={{ 
+              margin: '0 0 6px 0', 
+              color: '#333', 
+              fontSize: '12px',
+              borderLeft: '3px solid #28a745',
+              paddingLeft: '6px'
+            }}>
+              Villages
+            </h4>
+            <div style={{ fontSize: '11px', display: 'flex', flexDirection: 'column', gap: '3px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: '#666' }}>Inhabited:</span>
+                <span style={{ fontWeight: '600' }}>{district.factSheet.inhabitedVillages.toLocaleString()}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: '#666' }}>Uninhabited:</span>
+                <span style={{ fontWeight: '600' }}>{district.factSheet.uninhabitedVillages.toLocaleString()}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: '#666' }}>Forest Fringe:</span>
+                <span style={{ fontWeight: '600' }}>{district.factSheet.forestFringeVillages.toLocaleString()}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* FRA Analysis */}
+          <div>
+            <h4 style={{ 
+              margin: '0 0 6px 0', 
+              color: '#333', 
+              fontSize: '12px',
+              borderLeft: '3px solid #ffc107',
+              paddingLeft: '6px'
+            }}>
+              FRA Analysis
+            </h4>
+            <div style={{ fontSize: '11px', display: 'flex', flexDirection: 'column', gap: '3px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: '#666' }}>FRA Potential:</span>
+                <span style={{ fontWeight: '600', color: '#28a745' }}>{district.factSheet.fraPotentialVillages.toLocaleString()}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: '#666' }}>Non-Potential:</span>
+                <span style={{ fontWeight: '600', color: '#dc3545' }}>{district.factSheet.fraNonPotentialVillages.toLocaleString()}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: '#666' }}>Unsurveyed:</span>
+                <span style={{ fontWeight: '600', color: '#fd7e14' }}>{district.factSheet.unsurveyed.toLocaleString()}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Forest Coverage */}
+          <div>
+            <h4 style={{ 
+              margin: '0 0 6px 0', 
+              color: '#333', 
+              fontSize: '12px',
+              borderLeft: '3px solid #20c997',
+              paddingLeft: '6px'
+            }}>
+              Forest Coverage (km²)
+            </h4>
+            <div style={{ fontSize: '11px', display: 'flex', flexDirection: 'column', gap: '3px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: '#666' }}>Total:</span>
+                <span style={{ fontWeight: '600' }}>{district.factSheet.totalForestArea.toLocaleString()}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: '#666' }}>FRA Area:</span>
+                <span style={{ fontWeight: '600' }}>{district.factSheet.potentialForestAreaUnderFRA.toLocaleString()}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: '#666' }}>CFR:</span>
+                <span style={{ fontWeight: '600' }}>{district.factSheet.potentialCFRArea.toLocaleString()}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: '#666' }}>IFR:</span>
+                <span style={{ fontWeight: '600' }}>{district.factSheet.potentialIFRArea.toLocaleString()}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Progress Bar */}
+        <div style={{ marginTop: '15px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', marginBottom: '4px' }}>
+            <span style={{ color: '#666' }}>FRA Potential</span>
+            <span style={{ fontWeight: '600' }}>{fraEfficiency}%</span>
+          </div>
+          <div style={{
+            width: '100%',
+            height: '6px',
+            background: '#e9ecef',
+            borderRadius: '3px',
+            overflow: 'hidden'
+          }}>
+            <div style={{
+              width: `${fraEfficiency}%`,
+              height: '100%',
+              background: getCategoryColor(district.category),
+              transition: 'width 0.3s ease'
+            }}></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Main Component with 3-column layout
 const FRAAppLayout: React.FC = () => {
   const mapRef = useRef<LeafletMap | null>(null);
   const odishaLayerRef = useRef<FeatureGroup | null>(null);
-
-  const [showModal, setShowModal] = useState(false);
-  const [modalDistrict, setModalDistrict] = useState("");
-  const [modalCategory, setModalCategory] = useState("");
+  const [selectedDistrict, setSelectedDistrict] = useState<any>(null);
 
   useEffect(() => {
     if (!mapRef.current) {
@@ -250,20 +565,24 @@ const FRAAppLayout: React.FC = () => {
     const markers = L.featureGroup();
     odishaDistrictCenters.forEach((dist) => {
       const marker = L.circleMarker([dist.lat, dist.lng], {
-        radius: 10,
+        radius: 12,
         fillColor: fraColorFor(dist.category),
         color: "#fff",
         weight: 2,
         fillOpacity: 0.8,
       });
-      marker.bindPopup(getFactSheetHTML(dist.factSheet, dist.name));
+      
+      // Add click handler
+      marker.on('click', () => {
+        setSelectedDistrict(dist);
+      });
+      
       marker.addTo(markers);
     });
 
     markers.addTo(map);
     odishaLayerRef.current = markers;
 
-    // Fit map to show all districts
     const odishaBounds = markers.getBounds();
     if (odishaBounds.isValid()) {
       map.fitBounds(odishaBounds);
@@ -274,117 +593,38 @@ const FRAAppLayout: React.FC = () => {
     <div style={{ 
       padding: '20px', 
       fontFamily: 'Arial, sans-serif',
-      maxWidth: '1800px',
-      margin: '0 auto',
-      background: 'white',
-      minHeight: '50vh',
-      minWidth:'56vw',
-      color: '#ffffff'
+      background: '#f5f5f5',
+      minHeight: '100vh'
     }}>
       <div style={{
         display: 'grid',
-        gridTemplateColumns: '2fr 1fr',
+        gridTemplateColumns: '20% 60% 20%', // Legends 20%, Map 60%, Statistics 20%
         gap: '20px',
-        alignItems: 'start'
+        minWidth: '90vw',
+        margin: '0 auto'
       }}>
-        <div id="map" style={{ 
-          height: '600px', 
-          borderRadius: '10px',
-          boxShadow: '0 6px 20px rgba(0,0,0,0.4)',
-          border: '2px solid #555',
-          overflow: 'hidden'
-        }}></div>
-
+        {/* Left Panel - Legends (20%) */}
+        <LegendsPanel />
+        
+        {/* Center Panel - Map (60%) */}
         <div style={{
-          background: 'linear-gradient(135deg, #34495e 0%, rgba(0,0,0,0.2) 100%)',
-          padding: '20px',
+          background: 'white',
           borderRadius: '10px',
-          boxShadow: '0 4px 15px rgba(0,0,0,0.3)',
-          height: 'fit-content',
-          border: '1px solid #444'
+          overflow: 'hidden',
+          boxShadow: '0 6px 20px rgba(0,0,0,0.15)'
         }}>
-          <h3 style={{ marginBottom: '15px', color: '#ffffff', borderBottom: '2px solid #3498db', paddingBottom: '8px' }}>Legend</h3>
-          <div>
-            {Object.entries(fraData).map(([cat, data]) => (
-              <div key={cat} style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                marginBottom: '12px',
-                fontSize: '13px',
-                padding: '8px',
-                background: 'rgba(255,255,255,0.05)',
-                borderRadius: '6px',
-                border: '1px solid rgba(255,255,255,0.1)'
-              }}>
-                <span
-                  style={{ 
-                    width: '18px',
-                    height: '18px',
-                    backgroundColor: data.color,
-                    display: 'inline-block',
-                    marginRight: '10px',
-                    borderRadius: '50%',
-                    border: '2px solid #fff',
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.3)'
-                  }}
-                ></span>
-                <span style={{ color: '#ffffff', fontWeight: '500' }}>
-                  {cat} - {data.cfrPotential}
-                </span>
-              </div>
-            ))}
-          </div>
+          <div id="map" style={{ 
+            height: '580px',
+            width: '100%'
+          }}></div>
         </div>
+        
+        {/* Right Panel - Statistics (20%) */}
+        <DistrictStatistics 
+          district={selectedDistrict} 
+          onClose={() => setSelectedDistrict(null)} 
+        />
       </div>
-
-      {showModal && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'rgba(0,0,0,0.8)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 1000
-          }}
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setShowModal(false);
-          }}
-        >
-          <div style={{
-            background: 'linear-gradient(135deg, #2c3e50 0%, #34495e 100%)',
-            padding: '30px',
-            borderRadius: '15px',
-            maxWidth: '500px',
-            width: '90%',
-            border: '2px solid #555',
-            boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
-            color: '#ffffff'
-          }}>
-            <h3 style={{ color: '#ffffff', marginBottom: '15px' }}>{modalDistrict}</h3>
-            <p style={{ color: '#bdc3c7' }}><b>Category:</b> {modalCategory}</p>
-            <p style={{ color: '#bdc3c7' }}><b>CFR Potential:</b> {fraData[modalCategory]?.cfrPotential}</p>
-            <p style={{ color: '#bdc3c7', marginBottom: '20px' }}>{fraData[modalCategory]?.description}</p>
-            <button 
-              onClick={() => setShowModal(false)}
-              style={{
-                padding: '12px 24px',
-                background: 'linear-gradient(135deg, #3498db 0%, #2980b9 100%)',
-                color: 'white',
-                border: 'none',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                fontWeight: 'bold',
-                boxShadow: '0 3px 8px rgba(0,0,0,0.3)'
-              }}
-            >Close</button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

@@ -14,11 +14,11 @@ const Header = () => {
       height={80}
     />
       </div>
-      <div className="flex gap-6">
+      {/* <div className="flex gap-6">
         <StateSelector></StateSelector>
         <YearSelector></YearSelector>
         
-      </div>
+      </div> */}
     </div>
   );
 };
