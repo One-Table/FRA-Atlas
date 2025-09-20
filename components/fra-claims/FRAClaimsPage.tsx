@@ -3,6 +3,7 @@
 import { Calendar, CheckCircle, Clock, Eye, FileText, Home, MapPin, Search, User, Users, XCircle } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useEffect, useMemo, useState } from 'react';
+import Image from "next/image";
 
 // Import data and utilities from external mock-data
 import {
@@ -184,19 +185,13 @@ const FRAClaimsPage = () => {
           {/* Left Logo + Title */}
           <div className="flex items-center gap-4">
             {/* Ministry Logo (replace src with correct logo path) */}
-            <img
-              src="/logo-emblem.png"
-              alt="Emblem of India"
-              className="h-12 w-auto"
-            />
-            <div>
-              <h1 className="text-xl font-bold text-gray-900">
-                जनजातीय कार्य मंत्रालय
-              </h1>
-              <h2 className="text-xl font-bold text-gray-900">
-                MINISTRY OF TRIBAL AFFAIRS
-              </h2>
-            </div>
+            <Image
+                      src="https://upload.wikimedia.org/wikipedia/commons/f/f0/Ministry_of_Tribal_Affairs.svg"
+                      alt="Ministry of Tribal Affairs Logo"
+                      width={200}
+                      height={80}
+                    />
+            
           </div>
 
           {/* Right Stats */}

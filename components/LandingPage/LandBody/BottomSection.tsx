@@ -3,12 +3,15 @@ import Link from "next/link";
 
 export default function BottomSection() {
   const cards = [
-    { title: "FRA Implementation Records", href: "/frarecords" },
-    { title: "Documentation", href: "/documentation" },
+    { title: "FRA Implementation Records", href: "/documentation" },
+    { title: "Documentation", href: "/frarecords" },
     { title: "NGOs", href: "/NGOS" },
     { title: "FRA Atlas", href: "/fraatlas" },
-    { title: "Classification", href: "/classification" },
+    { title: "FRA Claims", href: "/fra-claims" },
+
   ];
+
+  
 
   return (
     <div className="relative flex justify-center py-16 bg-gradient-to-br from-green-200 via-green-100 to-white overflow-hidden">

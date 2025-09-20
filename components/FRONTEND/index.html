@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FRA Atlas & Decision Support System - Ministry of Tribal Affairs</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- App Root -->
+    <div id="app-root">
+        <!-- Header Component -->
+        <header class="header" id="header-component">
+            <div class="header-left">
+                <div class="logo">
+                    <div class="logo-emblem">🏛️</div>
+                    <div class="logo-text">
+                        <h1>FRA Atlas & DSS</h1>
+                        <p>Ministry of Tribal Affairs, Government of India</p>
+                    </div>
+                </div>
+            </div>
+            <nav class="header-nav" id="main-navigation">
+                <!-- Navigation items will be rendered here -->
+            </nav>
+            <div class="header-right">
+                <div class="language-selector">
+                    <select class="form-control" id="language-selector">
+                        <option value="en">English</option>
+                        <option value="hi">हिंदी</option>
+                    </select>
+                </div>
+                <div class="notification-icon">🔔</div>
+                <div class="user-profile">
+                    <div class="user-avatar">👤</div>
+                    <div class="user-info">
+                        <span class="user-name">Dr. Rajesh Kumar</span>
+                        <span class="user-role">MoTA Official</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Layout -->
+        <div class="main-layout">
+            <!-- Sidebar Component -->
+            <aside class="sidebar" id="sidebar-component">
+                <!-- Sidebar content will be rendered here -->
+            </aside>
+
+            <!-- Main Content Area -->
+            <main class="main-content" id="main-content">
+                <!-- Content sections will be rendered here -->
+            </main>
+
+            <!-- Right Panel Component -->
+            <aside class="right-panel" id="right-panel-component">
+                <!-- Right panel content will be rendered here -->
+            </aside>
+        </div>
+
+        <!-- Status Bar Component -->
+        <footer class="status-bar" id="status-bar-component">
+            <!-- Status bar content will be rendered here -->
+        </footer>
+    </div>
+
+    <!-- Modal Container -->
+    <div id="modal-container"></div>
+
+    <!-- Notification Container -->
+    <div id="notification-container"></div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay hidden" id="loading-overlay">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Loading...</p>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

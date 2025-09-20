@@ -4,8 +4,6 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 const images = [
   // ✅ Use direct image URLs from Pexels/Unsplash (download button → "copy image address")
   "https://images.pexels.com/photos/9078372/pexels-photo-9078372.jpeg?auto=compress&cs=tinysrgb&w=1200",  
-  "https://images.pexels.com/photos/32696007/pexels-photo-32696007.jpeg?auto=compress&cs=tinysrgb&w=1200",
-  "https://images.unsplash.com/photo-1557149126-b2d4bd0f37b8?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
   "https://cdn.pixabay.com/photo/2017/11/28/21/10/tribal-people-nature-2939285_1280.jpg",
 ];
 
