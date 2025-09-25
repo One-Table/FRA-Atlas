@@ -1,7 +1,7 @@
 'use client'
-import React, { useEffect, useRef, useState } from "react";
-import L, { Map as LeafletMap, FeatureGroup } from "leaflet";
+import L, { GeoJSON as LeafletGeoJSON, Map as LeafletMap } from "leaflet";
 import "leaflet/dist/leaflet.css";
+import React, { useEffect, useRef, useState } from "react";
 
 const fraData: Record<string, any> = {
   "Very High Potential": {
@@ -715,15 +715,25 @@ const DistrictStatistics: React.FC<{ district: any; onClose: () => void }> = ({ 
   );
 };
 
-// Main Component with 3-column layout
+const ODISHA_GEOJSON_URL = "/data/geojson/states/odisha.geojson";
+
+// Helper to get CFR color for a district name
+const getDistrictCFRColor = (districtName: string) => {
+  const found = odishaDistrictCenters.find(
+    d => d.name.toLowerCase() === districtName.toLowerCase()
+  );
+  return found ? fraColorFor(found.category) : "#ccc";
+};
+
 const FRAAppLayout: React.FC = () => {
   const mapRef = useRef<LeafletMap | null>(null);
-  const odishaLayerRef = useRef<FeatureGroup | null>(null);
+  const geoJsonLayerRef = useRef<LeafletGeoJSON | null>(null);
   const [selectedDistrict, setSelectedDistrict] = useState<any>(null);
 
+  // Initialize map
   useEffect(() => {
     if (!mapRef.current) {
-      const map = L.map("map").setView([20.95, 84.8], 6);
+      const map = L.map("map").setView([20.95, 84.8], 7);
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution: "© OpenStreetMap contributors",
       }).addTo(map);
@@ -731,86 +741,109 @@ const FRAAppLayout: React.FC = () => {
     }
   }, []);
 
+  // Add Odisha district borders from GeoJSON, fill with CFR color
   useEffect(() => {
     if (!mapRef.current) return;
     const map = mapRef.current;
 
-    if (odishaLayerRef.current) {
-      map.removeLayer(odishaLayerRef.current);
-      odishaLayerRef.current = null;
+    // Remove previous GeoJSON layer if exists
+    if (geoJsonLayerRef.current) {
+      map.removeLayer(geoJsonLayerRef.current);
+      geoJsonLayerRef.current = null;
     }
 
-    const markers = L.featureGroup();
-    odishaDistrictCenters.forEach((dist) => {
-      const marker = L.circleMarker([dist.lat, dist.lng], {
-        radius: 12,
-        fillColor: fraColorFor(dist.category),
-        color: "#fff",
-        weight: 2,
-        fillOpacity: 0.8,
+    // Fetch and add the GeoJSON
+    fetch(ODISHA_GEOJSON_URL)
+      .then(res => res.json())
+      .then((geojson) => {
+        const layer = L.geoJSON(geojson, {
+          style: (feature) => {
+            const districtName = feature.properties.district || feature.properties.DISTRICT;
+            const fillColor = getDistrictCFRColor(districtName);
+            return {
+              color: "#1976D2",
+              weight: 2,
+              fillColor,
+              fillOpacity: 0.65,
+            };
+          },
+          onEachFeature: (feature, layer) => {
+            const districtName = feature.properties.district || feature.properties.DISTRICT;
+            layer.bindTooltip(districtName, { sticky: true });
+            // Click to select district
+            layer.on('click', () => {
+              const dist = odishaDistrictCenters.find(
+                d => d.name.toLowerCase() === districtName.toLowerCase()
+              );
+              if (dist) setSelectedDistrict(dist);
+            });
+            // Highlight on hover
+            layer.on('mouseover', function (e) {
+              (e.target as L.Path).setStyle({
+                weight: 4,
+                color: "#2563eb",
+                fillOpacity: 0.85,
+              });
+            });
+            layer.on('mouseout', function (e) {
+              (e.target as L.Path).setStyle({
+                weight: 2,
+                color: "#1976D2",
+                fillColor: getDistrictCFRColor(districtName),
+                fillOpacity: 0.65,
+              });
+            });
+          }
+        });
+        layer.addTo(map);
+        geoJsonLayerRef.current = layer;
+        // Fit bounds to Odisha
+        map.fitBounds(layer.getBounds());
       });
-      
-      // Add click handler
-      marker.on('click', () => {
-        setSelectedDistrict(dist);
-      });
-      
-      marker.addTo(markers);
-    });
-
-    markers.addTo(map);
-    odishaLayerRef.current = markers;
-
-    const odishaBounds = markers.getBounds();
-    if (odishaBounds.isValid()) {
-      map.fitBounds(odishaBounds);
-    }
   }, []);
 
   // Handle district selection from search
   const handleDistrictSelect = (district: any) => {
     setSelectedDistrict(district);
-    
-    // Zoom to the selected district on the map
     if (mapRef.current) {
-      mapRef.current.setView([district.lat, district.lng], 8);
+      mapRef.current.setView([district.lat, district.lng], 9);
     }
   };
 
   return (
-    <div style={{ 
-      padding: '20px', 
+    <div style={{
+      padding: '20px',
       fontFamily: 'Arial, sans-serif',
       background: '#f5f5f5',
       minHeight: '100vh'
     }}>
       <div style={{
         display: 'grid',
-        gridTemplateColumns: '20% 60% 20%', // Legends 20%, Map 60%, Statistics 20%
+        gridTemplateColumns: '20% 60% 20%',
         gap: '20px',
         minWidth: '90vw',
         margin: '0 auto'
       }}>
-        {/* Left Panel - Legends (20%) */}
+        {/* Left Panel - Legends */}
         <LegendsPanel onDistrictSelect={handleDistrictSelect} />
-        
-        {/* Center Panel - Map (60%) */}
+
+        {/* Center Panel - Map */}
         <div style={{
           background: 'white',
           borderRadius: '10px',
           overflow: 'hidden',
           boxShadow: '0 6px 20px rgba(0,0,0,0.15)'
         }}>
-          <div id="map" style={{ 
+          <div id="map" style={{
             height: '580px',
             width: '100%'
           }}></div>
         </div>
-        
-        {/* Right Panel - Statistics (20%) */}
-        <DistrictStatistics 
-          district={selectedDistrict} 
-          onClose={() => setSelectedDistrict(null)} 
+
+        {/* Right Panel - Statistics */}
+        <DistrictStatistics
+          district={selectedDistrict}
+          onClose={() => setSelectedDistrict(null)}
         />
       </div>
     </div>

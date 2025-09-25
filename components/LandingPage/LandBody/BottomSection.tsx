@@ -4,7 +4,7 @@ import Link from "next/link";
 export default function BottomSection() {
   const cards = [
     { title: "FRA Implementation Records", href: "/documentation" },
-    { title: "Documentation", href: "/frarecords" },
+    { title: "FRA Documentations", href: "/tribal-repository" },
     { title: "NGOs", href: "/NGOS" },
     { title: "FRA Atlas", href: "/fraatlas" },
     { title: "FRA Claims", href: "/fra-claims" },
