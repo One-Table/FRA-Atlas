@@ -56,6 +56,13 @@ export interface FRACommunityResourceClaim {
 
 // District boundaries data
 export const districtBoundaries = {
+  'Mayurbhanj': {
+    center: [21.93, 86.73] as [number, number],
+    radius: 25000,
+    boundary: [
+      [22.5, 85.8], [22.5, 87.1], [21.8, 87.1], [21.3, 86.8], [21.3, 85.8], [22.5, 85.8]
+    ]
+  },
   'Kandhamal': {
     center: [20.4731, 84.0968] as [number, number],
     radius: 25000,
@@ -132,6 +139,43 @@ export const mockFRAIndividualClaims: FRAIndividualClaim[] = [
     status: "approved",
     titleNumber: "KDM/2023/001",
     area: 3.0
+  },
+  {
+    id: "MYB005",
+    claimantName: "Budhuram Murmu",
+    spouseName: "Sumi Murmu",
+    fatherMotherName: "Lakhiram Murmu",
+    address: "Tola Sahi, Astia Village",
+    village: "Astia",
+    gramPanchayat: "Barasol",
+    tehsilTaluka: "Jashipur",
+    district: "Mayurbhanj",
+    scheduledTribe: true,
+    otherTraditionalForestDweller: false,
+    familyMembers: [
+      { name: "Sumi Murmu", age: 38, relationship: "Wife" },
+      { name: "Chhotu Murmu", age: 15, relationship: "Son" },
+      { name: "Buli Murmu", age: 10, relationship: "Daughter" }
+    ],
+    landClaims: [
+      {
+        type: "habitation",
+        area: 0.25,
+        description: "Residential area with traditional Santhal dwelling",
+        evidence: ["Gram Sabha Resolution", "Elder Witness"]
+      },
+      {
+        type: "self-cultivation",
+        area: 1.75,
+        description: "Upland cultivation for maize and millets",
+        evidence: ["Cultivation Proof", "Satellite Imagery"]
+      }
+    ],
+    coordinates: [86.2917, 22.0405],
+    claimDate: "2023-09-01",
+    status: "pending",
+    titleNumber: "N/A",
+    area: 2.0
   },
   {
     id: "IND002",
@@ -1511,14 +1555,14 @@ export const handleEnhancedClaimSelect = (
   setHighlightedDistrict: (district: string) => void
 ) => {
   setSelectedClaim(claim);
-  
+
   // Set initial coordinates and zoom for the specific claim location
   setMapCenter(claim.coordinates);
   setMapZoom(14); // Close zoom for specific location
-  
+
   // Highlight the district
   setHighlightedDistrict(claim.district);
-  
+
   // Smooth transition: first zoom to district, then to specific location
   const districtInfo = districtBoundaries[claim.district as keyof typeof districtBoundaries];
   if (districtInfo) {
@@ -1527,7 +1571,7 @@ export const handleEnhancedClaimSelect = (
       setMapCenter(districtInfo.center);
       setMapZoom(9);
     }, 100);
-    
+
     // Then zoom to specific location
     setTimeout(() => {
       setMapCenter(claim.coordinates);
@@ -1544,59 +1588,59 @@ export const handleEnhancedClaimSelect = (
 
 // Search utility functions
 export const searchByName = (
-  query: string, 
-  individuals: FRAIndividualClaim[], 
+  query: string,
+  individuals: FRAIndividualClaim[],
   communities: FRACommunityResourceClaim[]
 ) => {
-  const filteredIndividuals = individuals.filter(claim => 
+  const filteredIndividuals = individuals.filter(claim =>
     claim.claimantName.toLowerCase().includes(query.toLowerCase()) ||
     claim.spouseName?.toLowerCase().includes(query.toLowerCase()) ||
     claim.fatherMotherName.toLowerCase().includes(query.toLowerCase())
   );
-  
+
   const filteredCommunities = communities.filter(claim =>
-    claim.claimants.some(claimant => 
+    claim.claimants.some(claimant =>
       claimant.name.toLowerCase().includes(query.toLowerCase())
     )
   );
-  
+
   return { individuals: filteredIndividuals, communities: filteredCommunities };
 };
 
 export const searchByLocation = (
   query: string,
-  individuals: FRAIndividualClaim[], 
+  individuals: FRAIndividualClaim[],
   communities: FRACommunityResourceClaim[]
 ) => {
-  const filteredIndividuals = individuals.filter(claim => 
+  const filteredIndividuals = individuals.filter(claim =>
     claim.village.toLowerCase().includes(query.toLowerCase()) ||
     claim.district.toLowerCase().includes(query.toLowerCase()) ||
     claim.tehsilTaluka.toLowerCase().includes(query.toLowerCase()) ||
     claim.gramPanchayat.toLowerCase().includes(query.toLowerCase())
   );
-  
-  const filteredCommunities = communities.filter(claim => 
+
+  const filteredCommunities = communities.filter(claim =>
     claim.village.toLowerCase().includes(query.toLowerCase()) ||
     claim.district.toLowerCase().includes(query.toLowerCase()) ||
     claim.tehsilTaluka.toLowerCase().includes(query.toLowerCase()) ||
     claim.gramPanchayat.toLowerCase().includes(query.toLowerCase())
   );
-  
+
   return { individuals: filteredIndividuals, communities: filteredCommunities };
 };
 
 export const searchByTitleNumber = (
   query: string,
-  individuals: FRAIndividualClaim[], 
+  individuals: FRAIndividualClaim[],
   communities: FRACommunityResourceClaim[]
 ) => {
-  const filteredIndividuals = individuals.filter(claim => 
+  const filteredIndividuals = individuals.filter(claim =>
     claim.titleNumber?.toLowerCase().includes(query.toLowerCase())
   );
-  
+
   const filteredCommunities = communities.filter(claim =>
     claim.titleNumber?.toLowerCase().includes(query.toLowerCase())
   );
-  
+
   return { individuals: filteredIndividuals, communities: filteredCommunities };
 };
