@@ -81,6 +81,8 @@ const StateMap: React.FC<StateMapProps> = (props) => {
           <CustomGeoJSON data={getStateFeatures(geoData) as any} onEachFeature={onEachFeature} />
         )}
       </MapContainer>
+
+      
     </div>
   );
 };

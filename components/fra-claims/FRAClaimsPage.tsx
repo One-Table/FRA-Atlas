@@ -191,8 +191,7 @@ const FRAClaimsPage = () => {
                       width={200}
                       height={80}
                     />
-            
-          </div>
+ </div>
 
           {/* Right Stats */}
           <div className="flex items-center gap-8 text-gray-800">
