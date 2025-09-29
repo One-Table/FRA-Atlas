@@ -47,11 +47,11 @@ const Circle = dynamic(() => import('react-leaflet').then(mod => mod.Circle), { 
 // Custom marker creation function
 const createCustomIcon = (status: string, isIndividual: boolean) => {
   if (typeof window === 'undefined') return null;
-  
+
   const L = require('leaflet');
   const color = status === 'approved' ? '#4CAF50' : status === 'pending' ? '#FF9800' : '#F44336';
   const icon = isIndividual ? '👤' : '👥';
-  
+
   return L.divIcon({
     html: `<div style="background: ${color}; border-radius: 50%; padding: 8px; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3); font-size: 16px; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px;">${icon}</div>`,
     className: 'custom-marker',
@@ -64,7 +64,7 @@ const createCustomIcon = (status: string, isIndividual: boolean) => {
 // District marker creation function for boundary center
 const createDistrictIcon = () => {
   if (typeof window === 'undefined') return null;
-  
+
   const L = require('leaflet');
   return L.divIcon({
     html: `<div style="background: #1976D2; border-radius: 50%; padding: 10px; border: 3px solid white; box-shadow: 0 3px 6px rgba(0,0,0,0.4); font-size: 18px; display: flex; align-items: center; justify-content: center; width: 50px; height: 50px; color: white;">📍</div>`,
@@ -78,11 +78,11 @@ const createDistrictIcon = () => {
 // Selected claim marker with pulsing golden border
 const createSelectedClaimIcon = (status: string, isIndividual: boolean) => {
   if (typeof window === 'undefined') return null;
-  
+
   const L = require('leaflet');
   const color = status === 'approved' ? '#4CAF50' : status === 'pending' ? '#FF9800' : '#F44336';
   const icon = isIndividual ? '👤' : '👥';
-  
+
   return L.divIcon({
     html: `<div style="background: ${color}; border-radius: 50%; padding: 12px; border: 4px solid #FFD700; box-shadow: 0 4px 8px rgba(0,0,0,0.4), 0 0 20px rgba(255,215,0,0.6); font-size: 20px; display: flex; align-items: center; justify-content: center; width: 60px; height: 60px; animation: pulse 2s infinite;">${icon}</div>`,
     className: 'selected-marker',
@@ -134,7 +134,7 @@ const useSimpleNotification = () => {
   const showSuccess = (message: string) => {
     setNotificationMessage(message);
     setShowNotification(true);
-    
+
     setTimeout(() => {
       setShowNotification(false);
     }, 3000);
@@ -168,7 +168,7 @@ const SuccessPopup: React.FC<{ show: boolean; message: string }> = ({ show, mess
     }}>
       <CheckCircle size={24} />
       {message}
-      
+
       <style jsx>{`
         @keyframes fadeInOut {
           0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
@@ -193,24 +193,27 @@ const FRAClaimsPage = () => {
   const [highlightedDistrict, setHighlightedDistrict] = useState<string | null>(null);
   const [showSchemeDetails, setShowSchemeDetails] = useState(false);
   const [showAtlas, setShowAtlas] = useState(false);
-  
+
   const { showNotification, notificationMessage, showSuccess } = useSimpleNotification();
 
   useEffect(() => {
     setIsClient(true);
-    
+
     // Add CSS animation for pulsing effect
     const style = document.createElement('style');
     style.textContent = `
-      @keyframes pulse {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.1); }
-        100% { transform: scale(1); }
-      }
-    `;
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+  `;
     document.head.appendChild(style);
-    
-    return () => document.head.removeChild(style);
+
+    return () => {
+      document.head.removeChild(style);
+      // Do not return anything!
+    };
   }, []);
 
   // Filtering & search
@@ -303,7 +306,7 @@ const FRAClaimsPage = () => {
   const handleSendNotification = (claim: FRAIndividualClaim) => {
     const eligibleCount = getEligibleSchemesCount(claim);
     const totalEligible = Object.values(claim.schemeEligibility).filter(s => s.eligible).length;
-    
+
     showSuccess(`Notification sent to ${claim.claimantName} for ${totalEligible} eligible scheme(s)`);
   };
 
@@ -319,7 +322,7 @@ const FRAClaimsPage = () => {
           </span>
         </h3>
       </div>
-      
+
       <div className="p-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Atlas Map Preview & Reference */}
@@ -335,7 +338,7 @@ const FRAClaimsPage = () => {
                 </div>
               )}
             </div>
-            
+
             {/* FRA Atlas Reference Display */}
             {claim.fraAtlasReference && (
               <div className="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
@@ -344,7 +347,7 @@ const FRAClaimsPage = () => {
                     <FileText size={16} />
                     FRA Atlas Reference
                   </h5>
-                  <button 
+                  <button
                     onClick={() => {
                       // In a real implementation, this would open the actual atlas file
                       showSuccess(`Opening FRA Atlas: ${claim.fraAtlasReference}`);
@@ -373,29 +376,35 @@ const FRAClaimsPage = () => {
                     </span>
                   </div>
                   <div className="mt-3 p-2 bg-white rounded border text-xs">
-                    <strong>Atlas Integration:</strong> This claim is mapped in the comprehensive FRA Atlas 
+                    <strong>Atlas Integration:</strong> This claim is mapped in the comprehensive FRA Atlas
                     system providing detailed forest rights visualization and geographic context.
                   </div>
                 </div>
               </div>
             )}
-            
+
             <div className="bg-gradient-to-br from-green-100 to-blue-100 rounded-lg p-6 text-center">
-              <div className="w-full h-48 bg-gradient-to-br from-green-200 to-blue-200 rounded-lg flex items-center justify-center mb-4">
+              <div className="w-full h-80 bg-gradient-to-br from-green-200 to-blue-200 rounded-lg flex items-center justify-center mb-4">
                 <div className="text-center">
                   <MapPin size={48} className="text-green-600 mx-auto mb-2" />
                   <div className="text-lg font-semibold text-gray-800">
                     {claim.village} Forest Atlas
                   </div>
-                  <div className="text-sm text-gray-600">
+                  <div className="text-sm text-gray-600 flex flex-col gap-4">
                     {claim.coordinates[0].toFixed(4)}°N, {claim.coordinates[1].toFixed(4)}°E
+                    <Image
+                      src="/data/photos/FRA_ATLAS_TEST.jpg"
+                      alt="Profile Picture"
+                      width={250}
+                      height={250}
+                    />
                   </div>
                   <div className="text-xs text-blue-600 mt-2 font-medium">
-                    Referenced in: FRA_ATLAS_TEST.jpg
+                    
                   </div>
                 </div>
               </div>
-              
+
               <div className="grid grid-cols-3 gap-2 text-xs">
                 <div className="bg-green-500 text-white p-2 rounded">
                   <div>Forest Land</div>
@@ -422,10 +431,9 @@ const FRAClaimsPage = () => {
               {claim.landClaims.map((landClaim, idx) => (
                 <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <div className="flex items-center gap-2">
-                    <div className={`w-3 h-3 rounded-full ${
-                      landClaim.type === 'habitation' ? 'bg-blue-500' :
-                      landClaim.type === 'self-cultivation' ? 'bg-yellow-500' : 'bg-green-500'
-                    }`}></div>
+                    <div className={`w-3 h-3 rounded-full ${landClaim.type === 'habitation' ? 'bg-blue-500' :
+                        landClaim.type === 'self-cultivation' ? 'bg-yellow-500' : 'bg-green-500'
+                      }`}></div>
                     <span className="text-sm font-medium capitalize">
                       {landClaim.type.replace('-', ' ')}
                     </span>
@@ -497,20 +505,20 @@ const FRAClaimsPage = () => {
     <div className="min-h-screen bg-white">
       {/* Success Notification Popup */}
       <SuccessPopup show={showNotification} message={notificationMessage} />
-      
+
       {/* Header */}
       <header className="bg-white shadow-sm border-b-4 border-yellow-400">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           {/* Left: Logo & Title */}
           <div className="flex items-center gap-4">
-            <Image 
-              src="https://upload.wikimedia.org/wikipedia/commons/f/f0/Ministry_of_Tribal_Affairs.svg" 
-              alt="Ministry of Tribal Affairs Logo" 
-              width={200} 
-              height={80} 
+            <Image
+              src="https://upload.wikimedia.org/wikipedia/commons/f/f0/Ministry_of_Tribal_Affairs.svg"
+              alt="Ministry of Tribal Affairs Logo"
+              width={200}
+              height={80}
             />
           </div>
-          
+
           {/* Right: Stats */}
           <div className="flex items-center gap-8 text-gray-800">
             <div className="text-center">
@@ -554,8 +562,8 @@ const FRAClaimsPage = () => {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Search By</label>
-                <select 
-                  value={searchType} 
+                <select
+                  value={searchType}
                   onChange={(e) => setSearchType(e.target.value as 'name' | 'location' | 'title')}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all text-black bg-white"
                 >
@@ -564,15 +572,15 @@ const FRAClaimsPage = () => {
                   <option value="title">Title Number</option>
                 </select>
               </div>
-              
+
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
                 <input
                   type="text"
                   placeholder={
                     searchType === 'name' ? 'Enter claimant name...' :
-                    searchType === 'location' ? 'Enter village, district, or tehsil...' :
-                    'Enter title number...'
+                      searchType === 'location' ? 'Enter village, district, or tehsil...' :
+                        'Enter title number...'
                   }
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -580,12 +588,12 @@ const FRAClaimsPage = () => {
                   style={{ color: '#000', backgroundColor: '#fff' }}
                 />
               </div>
-              
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
-                  <select 
-                    value={statusFilter} 
+                  <select
+                    value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value as any)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all text-black bg-white"
                   >
@@ -595,11 +603,11 @@ const FRAClaimsPage = () => {
                     <option value="rejected">Rejected</option>
                   </select>
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
-                  <select 
-                    value={claimTypeFilter} 
+                  <select
+                    value={claimTypeFilter}
                     onChange={(e) => setClaimTypeFilter(e.target.value as any)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all text-black bg-white"
                   >
@@ -620,7 +628,7 @@ const FRAClaimsPage = () => {
                 Search Results ({allClaims.length})
               </h3>
             </div>
-            
+
             <div className="max-h-96 overflow-y-auto">
               {allClaims.length === 0 ? (
                 <div className="p-8 text-center text-gray-500">
@@ -634,11 +642,10 @@ const FRAClaimsPage = () => {
                     <div
                       key={claim.id}
                       onClick={() => handleClaimSelect(claim)}
-                      className={`p-4 hover:bg-green-50 cursor-pointer transition-all duration-200 border-l-4 ${
-                        selectedClaim?.id === claim.id 
-                          ? 'border-green-500 bg-green-50' 
+                      className={`p-4 hover:bg-green-50 cursor-pointer transition-all duration-200 border-l-4 ${selectedClaim?.id === claim.id
+                          ? 'border-green-500 bg-green-50'
                           : 'border-transparent hover:border-green-300'
-                      }`}
+                        }`}
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
@@ -663,7 +670,7 @@ const FRAClaimsPage = () => {
                               </span>
                             )}
                           </div>
-                          
+
                           <div className="space-y-1 text-sm text-gray-600">
                             <div className="flex items-center gap-1">
                               <MapPin size={12} />
@@ -710,12 +717,12 @@ const FRAClaimsPage = () => {
                 )}
               </h3>
             </div>
-            
+
             <div className="h-96">
               {isClient && (
-                <MapContainer 
-                  center={mapCenter} 
-                  zoom={mapZoom} 
+                <MapContainer
+                  center={mapCenter}
+                  zoom={mapZoom}
                   style={{ height: '100%', width: '100%' }}
                   className="z-0"
                 >
@@ -723,7 +730,7 @@ const FRAClaimsPage = () => {
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                   />
-                  
+
                   {/* District Highlight Circle */}
                   {highlightedDistrict && districtBoundaries[highlightedDistrict as keyof typeof districtBoundaries] && (
                     <>
@@ -764,14 +771,14 @@ const FRAClaimsPage = () => {
                   {/* Individual Claims Markers */}
                   {filteredClaims.individuals.map((claim) => {
                     const isSelected = selectedClaim?.id === claim.id;
-                    const icon = isSelected 
+                    const icon = isSelected
                       ? createSelectedClaimIcon(claim.status, true)
                       : createCustomIcon(claim.status, true);
-                    
+
                     return icon ? (
-                      <Marker 
-                        key={claim.id} 
-                        position={claim.coordinates} 
+                      <Marker
+                        key={claim.id}
+                        position={claim.coordinates}
                         icon={icon}
                       >
                         <Popup>
@@ -808,14 +815,14 @@ const FRAClaimsPage = () => {
                   {/* Community Claims Markers */}
                   {filteredClaims.communities.map((claim) => {
                     const isSelected = selectedClaim?.id === claim.id;
-                    const icon = isSelected 
+                    const icon = isSelected
                       ? createSelectedClaimIcon(claim.status, false)
                       : createCustomIcon(claim.status, false);
-                    
+
                     return icon ? (
-                      <Marker 
-                        key={claim.id} 
-                        position={claim.coordinates} 
+                      <Marker
+                        key={claim.id}
+                        position={claim.coordinates}
                         icon={icon}
                       >
                         <Popup>
@@ -853,14 +860,14 @@ const FRAClaimsPage = () => {
             <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
               <div className="p-6 border-b border-gray-200 bg-green-50">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
+                  <h3 className="text-xl font-semibold text-gray-900 flex items-center gap-3">
                     <Eye size={20} className="text-green-600" />
                     Claim Details - {selectedClaim.id}
-                    <span className="ml-3 px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">
+                    <span className="ml-2 px-4 py-3 bg-blue-100 text-blue-800 text-sm rounded-full">
                       {selectedClaim.district} District
                     </span>
                     {isIndividualClaim(selectedClaim) && selectedClaim.fraAtlasReference && (
-                      <span className="ml-2 px-2 py-1 bg-purple-100 text-purple-600 text-sm rounded-full flex items-center gap-1">
+                      <span className="ml-2 px-4 py-3 bg-purple-100 text-purple-600 text-sm rounded-full flex items-center gap-1">
                         <ImageIcon size={12} />
                         Atlas Linked
                       </span>
@@ -871,22 +878,20 @@ const FRAClaimsPage = () => {
                       <>
                         <button
                           onClick={() => setShowSchemeDetails(!showSchemeDetails)}
-                          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                            showSchemeDetails 
-                              ? 'bg-blue-600 text-white' 
+                          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${showSchemeDetails
+                              ? 'bg-blue-600 text-white'
                               : 'bg-blue-100 text-blue-600 hover:bg-blue-200'
-                          }`}
+                            }`}
                         >
                           <DollarSign size={16} className="inline mr-1" />
                           Schemes
                         </button>
                         <button
                           onClick={() => setShowAtlas(!showAtlas)}
-                          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                            showAtlas 
-                              ? 'bg-purple-600 text-white' 
+                          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${showAtlas
+                              ? 'bg-purple-600 text-white'
                               : 'bg-purple-100 text-purple-600 hover:bg-purple-200'
-                          }`}
+                            }`}
                         >
                           <MapPin size={16} className="inline mr-1" />
                           Atlas
@@ -906,7 +911,7 @@ const FRAClaimsPage = () => {
                       <DollarSign size={20} className="text-blue-600" />
                       Government Scheme Eligibility
                     </h4>
-                    
+
                     {/* Always Green Notification Button */}
                     <button
                       onClick={() => handleSendNotification(selectedClaim)}
@@ -921,40 +926,38 @@ const FRAClaimsPage = () => {
                     {Object.entries(selectedClaim.schemeEligibility).map(([schemeKey, scheme]) => {
                       const IconComponent = getSchemeIcon(schemeKey);
                       const colorClass = getSchemeColor(scheme.status);
-                      
+
                       return (
                         <div key={schemeKey} className={`p-4 rounded-lg border-2 ${colorClass}`}>
                           <div className="flex items-center gap-3 mb-3">
                             <IconComponent size={20} />
                             <div>
                               <h5 className="font-semibold">{getSchemeName(schemeKey)}</h5>
-                              <span className={`text-xs px-2 py-1 rounded-full ${
-                                scheme.eligible ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'
-                              }`}>
+                              <span className={`text-xs px-2 py-1 rounded-full ${scheme.eligible ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'
+                                }`}>
                                 {scheme.eligible ? 'Eligible' : 'Not Eligible'}
                               </span>
                             </div>
                           </div>
-                          
+
                           <div className="space-y-2 text-sm">
                             <div className="flex justify-between">
                               <span>Status:</span>
-                              <span className={`font-medium ${
-                                scheme.status === 'enrolled' ? 'text-green-600' :
-                                scheme.status === 'pending' ? 'text-yellow-600' : 'text-gray-600'
-                              }`}>
+                              <span className={`font-medium ${scheme.status === 'enrolled' ? 'text-green-600' :
+                                  scheme.status === 'pending' ? 'text-yellow-600' : 'text-gray-600'
+                                }`}>
                                 {scheme.status === 'enrolled' ? '✓ Enrolled' :
-                                 scheme.status === 'pending' ? '⏳ Pending' : '○ Not Enrolled'}
+                                  scheme.status === 'pending' ? '⏳ Pending' : '○ Not Enrolled'}
                               </span>
                             </div>
-                            
+
                             {scheme.amount && (
                               <div className="flex justify-between">
                                 <span>Amount:</span>
                                 <span className="font-semibold text-green-600">₹{scheme.amount}</span>
                               </div>
                             )}
-                            
+
                             {scheme.reason && (
                               <div className="text-xs text-gray-600 mt-2 p-2 bg-gray-50 rounded">
                                 <AlertTriangle size={12} className="inline mr-1" />
@@ -1010,7 +1013,7 @@ const FRAClaimsPage = () => {
                             <FileText size={18} />
                             FRA Atlas Reference
                           </h4>
-                          <button 
+                          <button
                             onClick={() => showSuccess(`Opening FRA Atlas: ${selectedClaim.fraAtlasReference}`)}
                             className="flex items-center gap-1 text-sm text-purple-600 hover:text-purple-800 hover:bg-purple-100 px-3 py-1 rounded transition-colors"
                           >
@@ -1060,9 +1063,8 @@ const FRAClaimsPage = () => {
                           <div className="grid grid-cols-3 gap-2">
                             <span className="font-medium text-gray-700">Category</span>
                             <span className="col-span-2">
-                              <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                                selectedClaim.scheduledTribe ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'
-                              }`}>
+                              <span className={`px-3 py-1 rounded-full text-xs font-medium ${selectedClaim.scheduledTribe ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'
+                                }`}>
                                 {selectedClaim.scheduledTribe ? 'Scheduled Tribe' : 'Other Traditional Forest Dweller'}
                               </span>
                             </span>
@@ -1224,9 +1226,8 @@ const FRAClaimsPage = () => {
                         {selectedClaim.claimants.map((claimant, idx) => (
                           <div key={idx} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border">
                             <span className="text-sm font-medium text-gray-900">{claimant.name}</span>
-                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                              claimant.status === 'ST' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'
-                            }`}>
+                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${claimant.status === 'ST' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'
+                              }`}>
                               {claimant.status === 'ST' ? 'Scheduled Tribe' : 'Other Traditional Forest Dweller'}
                             </span>
                           </div>
