@@ -13,7 +13,7 @@ import {
   LayoutGrid 
 } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis, Area, AreaChart } from 'recharts';
+import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
 // TypeScript interfaces for type safety
 interface TribalSummaryData {
@@ -102,17 +102,158 @@ class TribalRepositoryAPI {
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 800));
 
-    // Mock data
+    if (url.includes('state=Odisha')) {
+      return {
+        summary: { tris: 2, documents: 394, documentTypes: 6, universitiesInstitutes: 2, sectors: 10 },
+        yearWiseDocuments: [
+          { year: '2000', count: 2 },
+          { year: '2010', count: 12 },
+          { year: '2020', count: 85 },
+          { year: '2024', count: 16 }
+        ],
+        documentsByTRI: [
+          { name: 'SCSTRTI', count: 340, fullName: 'Scheduled Castes & Scheduled Tribes Research and Training Institute' },
+          { name: 'SCSTRTI Academy', count: 54, fullName: 'SCSTRTI & Academy of Tribal Languages and Culture' }
+        ],
+        universities: [
+          { id: 'scstrti-bbsr', name: 'SCSTRTI, Bhubaneswar', documents: 340, state: 'Odisha', established: '1983' },
+          { id: 'scstrti-academy', name: 'SCSTRTI & Academy', documents: 54, state: 'Odisha', established: '1990' }
+        ],
+        documentTypes: [
+          { type: 'Book', count: 150, percentage: 38.1 },
+          { type: 'Report', count: 90, percentage: 22.8 },
+          { type: 'Journal', count: 70, percentage: 17.8 },
+          { type: 'Hand Book', count: 44, percentage: 11.1 },
+          { type: 'Dissertation', count: 25, percentage: 6.3 },
+          { type: 'Photo', count: 15, percentage: 3.8 }
+        ],
+        sectors: [
+          { sector: 'Monitoring & Evaluation', count: 90, percentage: 22, description: 'Program monitoring in Odisha' },
+          { sector: 'Education', count: 80, percentage: 20, description: 'Education sector in Odisha' },
+          { sector: 'Tribal Life', count: 50, percentage: 12.7, description: 'Cultural practices in Odisha' },
+          { sector: 'Art & Culture', count: 40, percentage: 10.1, description: 'Arts & culture Odisha' },
+          { sector: 'Ethnography', count: 35, percentage: 8.8, description: 'Anthropology studies Odisha' },
+          { sector: 'Socio-economic', count: 30, percentage: 7.6, description: 'Socio-economic development' },
+          { sector: 'Livelihood', count: 25, percentage: 6.3, description: 'Livelihood support' },
+          { sector: 'Health', count: 20, percentage: 5.1, description: 'Healthcare' },
+          { sector: 'Women Empowerment', count: 15, percentage: 3.8, description: 'Women empowerment initiatives' },
+          { sector: 'Forest Rights', count: 9, percentage: 2.3, description: 'Forest rights in Odisha' },
+        ],
+        filterOptions: {
+          states: ['All', 'Odisha', 'Tripura', 'Andhra Pradesh', 'Assam', 'Chhattisgarh', 'Kerala', 'Gujarat'],
+          years: ['All', '2024', '2023', '2022', '2021', '2020', '2019', '2018']
+        },
+        lastUpdated: '2024-09-29T00:00:00Z',
+        visitorCount: 7
+      };
+    }
+
+    if (url.includes('state=Tripura')) {
+      return {
+        summary: { tris: 3, documents: 202, documentTypes: 5, universitiesInstitutes: 1, sectors: 7 },
+        yearWiseDocuments: [
+          { year: '2000', count: 1 },
+          { year: '2010', count: 15 },
+          { year: '2020', count: 100 },
+          { year: '2024', count: 20 },
+        ],
+        documentsByTRI: [
+          { name: 'Tribal Res. Tripura', count: 202, fullName: 'Tribal Research & Cultural Institute, Tripura' }
+        ],
+        universities: [
+          { id: 'tribal-tripura', name: 'Tribal Research & Cultural Institute, Tripura', documents: 202, state: 'Tripura', established: '1988' }
+        ],
+        documentTypes: [
+          { type: 'Book', count: 80, percentage: 39.6 },
+          { type: 'Report', count: 60, percentage: 29.7 },
+          { type: 'Journal', count: 30, percentage: 14.8 },
+          { type: 'Dissertation', count: 20, percentage: 9.9 },
+          { type: 'Photo', count: 12, percentage: 5.9 }
+        ],
+        sectors: [
+          { sector: 'Tribal Life', count: 60, percentage: 29.7, description: 'Cultural practices in Tripura' },
+          { sector: 'Education', count: 50, percentage: 24.8, description: 'Education in Tripura' },
+          { sector: 'Health', count: 30, percentage: 14.8, description: 'Healthcare' },
+          { sector: 'Monitoring & Evaluation', count: 20, percentage: 9.9, description: 'Monitoring and evaluation' },
+          { sector: 'Women Empowerment', count: 15, percentage: 7.4, description: 'Women empowerment programs' },
+          { sector: 'Livelihood', count: 17, percentage: 8.4, description: 'Livelihoods' },
+          { sector: 'Art & Culture', count: 10, percentage: 4.9, description: 'Art and cultural heritage' },
+        ],
+        filterOptions: {
+          states: ['All', 'Odisha', 'Tripura', 'Andhra Pradesh', 'Assam', 'Chhattisgarh', 'Kerala', 'Gujarat'],
+          years: ['All', '2024', '2023', '2022', '2021', '2020', '2019', '2018']
+        },
+        lastUpdated: '2024-09-29T00:00:00Z',
+        visitorCount: 5
+      };
+    }
+
+    // Default mock data for other or 'All'
     return {
       summary: { tris: 16, documents: 1553, documentTypes: 8, universitiesInstitutes: 146, sectors: 23 },
-      yearWiseDocuments: [ { year: '1950', count: 1 }, { year: '1960', count: 7 }, { year: '1970', count: 10 }, { year: '1980', count: 22 }, { year: '1990', count: 30 }, { year: '2000', count: 57 }, { year: '2010', count: 64 }, { year: '2020', count: 175 }, { year: '2024', count: 18 } ],
-      documentsByTRI: [ { name: 'SCSTRTI', count: 507, fullName: 'Scheduled Castes & Scheduled Tribes Research and Training Institute' }, { name: 'Tribal Res. Tripura', count: 221, fullName: 'Tribal Research & Cultural Institute, Tripura' }, { name: 'Tribal Res. AP', count: 150, fullName: 'Department of Tribal Welfare Government of Andhra Pradesh' }, { name: 'Assam Institute', count: 123, fullName: 'Assam Institute of Research for Tribals and Scheduled Castes' }, { name: 'SCSTRTI Academy', count: 82, fullName: 'SCSTRTI & Academy of Tribal Languages and Culture' }, { name: 'Tribal Res. CG', count: 11, fullName: 'Tribal Research & Training Institute, Chhattisgarh' }, { name: 'KIRTADS', count: 9, fullName: 'Kerala Institute for Research, Training and Development Studies' }, { name: 'Tribal Res. Gujarat', count: 7, fullName: 'Tribal Research And Training Institute, Gujarat' }, { name: 'Tribal Res. Raipur', count: 5, fullName: 'Tribal Research & Training Institute, Raipur' }, { name: 'Others', count: 1, fullName: 'Other Institutions' } ],
-      universities: [ { id: 'scstrti-bbsr', name: 'Scheduled Castes & Scheduled Tribes Research and Training Institute (SCSTRTI), Bhubaneswar', documents: 394, state: 'Odisha', established: '1983' }, { id: 'tribal-tripura', name: 'Tribal Research & Cultural Institute, Tripura', documents: 202, state: 'Tripura', established: '1988' }, { id: 'tribal-ap', name: 'Department of Tribal Welfare Government of Andhra Pradesh', documents: 112, state: 'Andhra Pradesh', established: '1975' }, { id: 'assam-institute', name: 'Assam Institute of Research for Tribals and Scheduled Castes', documents: 108, state: 'Assam', established: '1992' }, { id: 'scstrti-academy', name: 'SCSTRTI & Academy of Tribal Languages and Culture', documents: 46, state: 'Odisha', established: '1990' }, { id: 'tribal-cg', name: 'Tribal Research & Training Institute, Chhattisgarh', documents: 36, state: 'Chhattisgarh', established: '2001' }, { id: 'kirtads', name: 'KIRTADS', documents: 32, state: 'Kerala', established: '1994' }, { id: 'tribal-gujarat', name: 'Tribal Research And Training Institute, Gujarat', documents: 30, state: 'Gujarat', established: '1987' }, { id: 'tribal-raipur', name: 'Tribal Research & Training Institute, Raipur, Chhattisgarh', documents: 21, state: 'Chhattisgarh', established: '1998' } ],
-      documentTypes: [ { type: 'Book', count: 474, percentage: 30.5 }, { type: 'Research Report', count: 432, percentage: 27.8 }, { type: 'Report', count: 325, percentage: 20.9 }, { type: 'Hand Book', count: 141, percentage: 9.1 }, { type: 'Journal', count: 130, percentage: 8.4 }, { type: 'Dissertation', count: 36, percentage: 2.3 }, { type: 'Statistical Hand Book', count: 11, percentage: 0.7 }, { type: 'Photo', count: 4, percentage: 0.3 } ],
-      sectors: [ { sector: 'Monitoring & Evaluation', count: 260, percentage: 16.7, description: 'Program monitoring and impact assessment' }, { sector: 'Education', count: 238, percentage: 15.3, description: 'Educational initiatives and literacy programs' }, { sector: 'Tribal Life', count: 188, percentage: 12.1, description: 'Cultural practices and lifestyle documentation' }, { sector: 'Art & Culture', count: 166, percentage: 10.7, description: 'Traditional arts and cultural heritage' }, { sector: 'Ethnography', count: 151, percentage: 9.7, description: 'Anthropological studies and documentation' }, { sector: 'Socio-economic', count: 148, percentage: 9.5, description: 'Economic development and social welfare' }, { sector: 'Livelihood', count: 77, percentage: 5.0, description: 'Income generation and employment' }, { sector: 'Monograph', count: 58, percentage: 3.7, description: 'Detailed studies on specific topics' }, { sector: 'Health', count: 49, percentage: 3.2, description: 'Healthcare and medical services' }, { sector: 'Data Science', count: 33, percentage: 2.1, description: 'Statistical analysis and data management' }, { sector: 'Forest Rights', count: 28, percentage: 1.8, description: 'Forest land rights and conservation' }, { sector: 'Demography', count: 19, percentage: 1.2, description: 'Population studies and census data' }, { sector: 'Traditional Knowledge', count: 19, percentage: 1.2, description: 'Indigenous knowledge systems' }, { sector: 'Women Empowerment', count: 17, percentage: 1.1, description: 'Gender equality and women development' } ],
+      yearWiseDocuments: [
+        { year: '1950', count: 1 },
+        { year: '1960', count: 7 },
+        { year: '1970', count: 10 },
+        { year: '1980', count: 22 },
+        { year: '1990', count: 30 },
+        { year: '2000', count: 57 },
+        { year: '2010', count: 64 },
+        { year: '2020', count: 175 },
+        { year: '2024', count: 18 }
+      ],
+      documentsByTRI: [
+        { name: 'SCSTRTI', count: 507, fullName: 'Scheduled Castes & Scheduled Tribes Research and Training Institute' },
+        { name: 'Tribal Res. Tripura', count: 221, fullName: 'Tribal Research & Cultural Institute, Tripura' },
+        { name: 'Tribal Res. AP', count: 150, fullName: 'Department of Tribal Welfare Government of Andhra Pradesh' },
+        { name: 'Assam Institute', count: 123, fullName: 'Assam Institute of Research for Tribals and Scheduled Castes' },
+        { name: 'SCSTRTI Academy', count: 82, fullName: 'SCSTRTI & Academy of Tribal Languages and Culture' },
+        { name: 'Tribal Res. CG', count: 11, fullName: 'Tribal Research & Training Institute, Chhattisgarh' },
+        { name: 'KIRTADS', count: 9, fullName: 'Kerala Institute for Research, Training and Development Studies' },
+        { name: 'Tribal Res. Gujarat', count: 7, fullName: 'Tribal Research And Training Institute, Gujarat' },
+        { name: 'Tribal Res. Raipur', count: 5, fullName: 'Tribal Research & Training Institute, Raipur' },
+        { name: 'Others', count: 1, fullName: 'Other Institutions' }
+      ],
+      universities: [
+        { id: 'scstrti-bbsr', name: 'Scheduled Castes & Scheduled Tribes Research and Training Institute (SCSTRTI), Bhubaneswar', documents: 394, state: 'Odisha', established: '1983' },
+        { id: 'tribal-tripura', name: 'Tribal Research & Cultural Institute, Tripura', documents: 202, state: 'Tripura', established: '1988' },
+        { id: 'tribal-ap', name: 'Department of Tribal Welfare Government of Andhra Pradesh', documents: 112, state: 'Andhra Pradesh', established: '1975' },
+        { id: 'assam-institute', name: 'Assam Institute of Research for Tribals and Scheduled Castes', documents: 108, state: 'Assam', established: '1992' },
+        { id: 'scstrti-academy', name: 'SCSTRTI & Academy of Tribal Languages and Culture', documents: 46, state: 'Odisha', established: '1990' },
+        { id: 'tribal-cg', name: 'Tribal Research & Training Institute, Chhattisgarh', documents: 36, state: 'Chhattisgarh', established: '2001' },
+        { id: 'kirtads', name: 'KIRTADS', documents: 32, state: 'Kerala', established: '1994' },
+        { id: 'tribal-gujarat', name: 'Tribal Research And Training Institute, Gujarat', documents: 30, state: 'Gujarat', established: '1987' },
+        { id: 'tribal-raipur', name: 'Tribal Research & Training Institute, Raipur, Chhattisgarh', documents: 21, state: 'Chhattisgarh', established: '1998' },
+      ],
+      documentTypes: [
+        { type: 'Book', count: 474, percentage: 30.5 },
+        { type: 'Research Report', count: 432, percentage: 27.8 },
+        { type: 'Report', count: 325, percentage: 20.9 },
+        { type: 'Hand Book', count: 141, percentage: 9.1 },
+        { type: 'Journal', count: 130, percentage: 8.4 },
+        { type: 'Dissertation', count: 36, percentage: 2.3 },
+        { type: 'Statistical Hand Book', count: 11, percentage: 0.7 },
+        { type: 'Photo', count: 4, percentage: 0.3 }
+      ],
+      sectors: [
+        { sector: 'Monitoring & Evaluation', count: 260, percentage: 16.7, description: 'Program monitoring and impact assessment' },
+        { sector: 'Education', count: 238, percentage: 15.3, description: 'Educational initiatives and literacy programs' },
+        { sector: 'Tribal Life', count: 188, percentage: 12.1, description: 'Cultural practices and lifestyle documentation' },
+        { sector: 'Art & Culture', count: 166, percentage: 10.7, description: 'Traditional arts and cultural heritage' },
+        { sector: 'Ethnography', count: 151, percentage: 9.7, description: 'Anthropological studies and documentation' },
+        { sector: 'Socio-economic', count: 148, percentage: 9.5, description: 'Economic development and social welfare' },
+        { sector: 'Livelihood', count: 77, percentage: 5.0, description: 'Income generation and employment' },
+        { sector: 'Monograph', count: 58, percentage: 3.7, description: 'Detailed studies on specific topics' },
+        { sector: 'Health', count: 49, percentage: 3.2, description: 'Healthcare and medical services' },
+        { sector: 'Data Science', count: 33, percentage: 2.1, description: 'Statistical analysis and data management' },
+        { sector: 'Forest Rights', count: 28, percentage: 1.8, description: 'Forest land rights and conservation' },
+        { sector: 'Demography', count: 19, percentage: 1.2, description: 'Population studies and census data' },
+        { sector: 'Traditional Knowledge', count: 19, percentage: 1.2, description: 'Indigenous knowledge systems' },
+        { sector: 'Women Empowerment', count: 17, percentage: 1.1, description: 'Gender equality and women development' }
+      ],
       filterOptions: { states: ['All', 'Odisha', 'Tripura', 'Andhra Pradesh', 'Assam', 'Chhattisgarh', 'Kerala', 'Gujarat'], years: ['All', '2024', '2023', '2022', '2021', '2020', '2019', '2018'] },
       lastUpdated: '2024-04-01T00:00:00Z',
-      visitorCount: 545315
+      visitorCount: 3
     };
   }
 }
@@ -311,7 +452,7 @@ export default function TribalRepositoryDashboard() {
                 {loading ? <div className="flex justify-center py-8"><RefreshCw className="h-6 w-6 animate-spin text-blue-500" /></div> : (
                   <table className="w-full text-sm">
                     <tbody>
-                      {filteredUniversities.map((item, index) => (
+                      {filteredUniversities.map((item) => (
                         <tr key={item.id} className="border-b border-gray-100 even:bg-blue-50/50 hover:bg-blue-100/70 transition-colors">
                           <td className="py-3 px-2 text-left">
                             <div className="font-medium text-gray-800">{item.name}</div>
