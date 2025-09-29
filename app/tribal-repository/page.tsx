@@ -355,11 +355,8 @@ export default function TribalRepositoryDashboard() {
         <div className="max-w-screen-xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <img src="app/tribal-repository/ChatGPT Image Sep 8, 2025 at 11_17_34 PM.png" alt="Logo" className="h-12 w-12" />
-              <div>
-                <div className="text-sm text-gray-600">ONE TABLE</div>
-                <div className="text-lg font-semibold text-gray-900">MINISTRY OF TRIBAL AFFAIRS</div>
-              </div>
+              <img src="https://upload.wikimedia.org/wikipedia/commons/f/f0/Ministry_of_Tribal_Affairs.svg" alt="Logo" className="h-24 w-48 " />
+  
             </div>
             <div className="text-center">
               <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-700 to-cyan-600 bg-clip-text text-transparent">
